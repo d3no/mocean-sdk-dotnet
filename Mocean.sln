@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoceanWindowFormTest", "Moc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocean", "Mocean\Mocean.csproj", "{D13BB1D0-909B-41BD-9A31-086882B9AFC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoceanASPCoreTest", "MoceanASPCoreTest\MoceanASPCoreTest.csproj", "{9183CCB5-078C-427C-A807-C4C9D9F41CD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoceanASPCoreTest", "MoceanASPCoreTest\MoceanASPCoreTest.csproj", "{9183CCB5-078C-427C-A807-C4C9D9F41CD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

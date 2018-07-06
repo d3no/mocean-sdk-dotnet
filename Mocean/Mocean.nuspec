@@ -1,18 +1,21 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
-    <projectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</projectUrl>
+    <id>Mocean.Csharp.Client</id>
+    <version>1.0.1.0</version>
+    <title>MoceanAPI</title>
+    <authors>Mocean</authors>
+    <owners>Mocean</owners>
+    <licenseUrl>https://github.com/MoceanAPI/mocean-sdk-dotnet/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/MoceanAPI/mocean-sdk-dotnet</projectUrl>
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <description>Official C#/.NET wrapper for the Mocean API</description>
+    <releaseNotes>Initial release. Update project site and license information</releaseNotes>
     <copyright>Copyright 2018</copyright>
-    <tags>Tag1 Tag2</tags>
+    <tags>SMS phone MoceanAPI</tags>
   </metadata>
+  <files>
+	<file src="bin\Debug\Mocean.dll" target="lib"></file>
+  </files>
 </package>

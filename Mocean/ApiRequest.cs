@@ -11,7 +11,8 @@ namespace Mocean
 {
     public class ApiRequest
     {
-        public const string REST_API = "https://rest-api.moceansms.com/rest/1";
+        public const string REST_API = "https://rest.moceanapi.com/rest/1";
+       
         public string subdomain { get; set; }
 
         private static StringBuilder BuildQueryString(IDictionary<string, string> parameters, Credentials creds = null)
