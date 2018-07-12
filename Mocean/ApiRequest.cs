@@ -12,6 +12,7 @@ namespace Mocean
     public class ApiRequest
     {
         public const string REST_API = "https://rest.moceanapi.com/rest/1";
+        public const string PL = "DOTNET-SDK";
        
         public string subdomain { get; set; }
 
@@ -31,7 +32,8 @@ namespace Mocean
             };
             parameters.Add("mocean-api-key", mocean_api_key);
             parameters.Add("mocean-api-secret", mocean_api_secret);
-
+            parameters.Add("mocean-medium", PL);
+            
             // security secret provided, sort and sign request
      
             var sortedParams = new SortedDictionary<string, string>(parameters);
@@ -72,7 +74,7 @@ namespace Mocean
             else
             {
                 string url = REST_API + subdomain + "?" +BuildQueryString(parameters, creds);
-
+                
                 var request = (HttpWebRequest)WebRequest.Create(url);
                 var response = (HttpWebResponse)request.GetResponse();
 
