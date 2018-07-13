@@ -41,8 +41,8 @@ The API can be called directly, using a simple array of parameters, the keys mat
 ```csharp
 Mocean.Message.Message _message = new Mocean.Message.Message()
 {
-    mocean_to = "60165465738",
-    mocean_from = "Billy",
+    mocean_to = "60123456789",
+    mocean_from = "MOCEAN",
     mocean_text = "Hello World",
     mocean_resp_format = "json",
 };
