@@ -1,0 +1,8 @@
+language: csharp
+solution: Mocean.sln
+install:
+  - nuget restore Mocean.sln
+  - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
+script:
+  - msbuild Mocean.sln
+  - mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./MoceanTests/bin/Debug/MoceanTests.dll
