@@ -1,19 +1,25 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Mocean.Account
 {
-    public class Pricing
+    public class Pricing : MoceanFactory
     {
-        [JsonProperty("mocean-resp-format")]
-        public string mocean_resp_format { get; set; }
+        public Pricing(Client client) : base(client.Credentials)
+        {
+            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret" };
+        }
 
-        [JsonProperty("mocean-mcc")]
-        public string mocean_mcc { get; set; }
-
-        [JsonProperty("mocean-mnc")]
-        public string mocean_mnc { get; set; }
-
-        [JsonProperty("mocean-delimiter")]
-        public string mocean_delimiter { get; set; }
+        public PricingResponse Inquiry(PricingRequest pricing = default(PricingRequest))
+        {
+            this.ValidatedAndParseFields(pricing);
+            var apiRequest = new ApiRequest("/account/pricing", "get", this.parameters);
+            return (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(apiRequest.Response)
+                .SetRawResponse(apiRequest.Response);
+        }
     }
 }

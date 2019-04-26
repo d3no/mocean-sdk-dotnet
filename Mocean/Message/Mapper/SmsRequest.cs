@@ -1,14 +1,19 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Mocean.Message
 {
-    public class Message
+    public class SmsRequest
     {
-        [JsonProperty("mocean-to")]
-        public string mocean_to { get; set; }
-
         [JsonProperty("mocean-from")]
         public string mocean_from { get; set; }
+
+        [JsonProperty("mocean-to")]
+        public string mocean_to { get; set; }
 
         [JsonProperty("mocean-text")]
         public string mocean_text { get; set; }
@@ -42,11 +47,5 @@ namespace Mocean.Message
 
         [JsonProperty("mocean-resp-format")]
         public string mocean_resp_format { get; set; }
-
-        [JsonProperty("mocean-msgid")]
-        public string mocean_msgid { get; set; }
-
-        [JsonProperty("mocean-error-code")]
-        public string mocean_error_code { get; set; }
     }
 }

@@ -45,17 +45,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractResponse.cs" />
     <Compile Include="Account\Balance.cs" />
-    <Compile Include="Account\Client.cs" />
+    <Compile Include="Account\Mapper\BalanceRequest.cs" />
+    <Compile Include="Account\Mapper\BalanceResponse.cs" />
     <Compile Include="Account\Pricing.cs" />
+    <Compile Include="Account\Mapper\PricingRequest.cs" />
+    <Compile Include="Account\Mapper\PricingResponse.cs" />
     <Compile Include="ApiRequest.cs" />
-    <Compile Include="Credentials.cs" />
-    <Compile Include="Message\Client.cs" />
-    <Compile Include="Message\Message.cs" />
-    <Compile Include="MoceanResponse.cs" />
+    <Compile Include="Auth\Basic.cs" />
+    <Compile Include="Auth\IAuth.cs" />
+    <Compile Include="Client.cs" />
+    <Compile Include="ErrorResponse.cs" />
+    <Compile Include="Exceptions\MoceanErrorException.cs" />
+    <Compile Include="Exceptions\RequiredFieldException.cs" />
+    <Compile Include="Message\MessageStatus.cs" />
+    <Compile Include="Message\Mapper\MessageStatusRequest.cs" />
+    <Compile Include="Message\Mapper\MessageStatusResponse.cs" />
+    <Compile Include="Message\Sms.cs" />
+    <Compile Include="Message\Mapper\SmsRequest.cs" />
+    <Compile Include="Message\Mapper\SmsResponse.cs" />
+    <Compile Include="MoceanFactory.cs" />
+    <Compile Include="NumberLookup\NumberLookup.cs" />
+    <Compile Include="NumberLookup\Mapper\NumberLookupRequest.cs" />
+    <Compile Include="NumberLookup\Mapper\NumberLookupResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Verify\Client.cs" />
-    <Compile Include="Verify\Verify.cs" />
+    <Compile Include="ResponseFactory.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Verify\SendCode.cs" />
+    <Compile Include="Verify\Mapper\SendCodeRequest.cs" />
+    <Compile Include="Verify\Mapper\SendCodeResponse.cs" />
+    <Compile Include="Verify\VerifyCode.cs" />
+    <Compile Include="Verify\Mapper\VerifyCodeRequest.cs" />
+    <Compile Include="Verify\Mapper\VerifyCodeResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

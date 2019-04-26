@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Mocean.Exceptions;
 
 namespace Mocean
 {
@@ -13,127 +14,126 @@ namespace Mocean
     {
         public const string REST_API = "https://rest.moceanapi.com/rest/1";
         public const string PL = "DOTNET-SDK";
-       
-        public string subdomain { get; set; }
-
-        private static StringBuilder BuildQueryString(IDictionary<string, string> parameters, Credentials creds = null)
+        private string Uri { get; set; }
+        public HttpStatusCode ResponseCode { get; private set; }
+        private string _response;
+        public string Response
         {
-            var mocean_api_key = creds.mocean_api_key;
-            var mocean_api_secret = creds.mocean_api_secret;
-
-            var sb = new StringBuilder();
-            Action<IDictionary<string, string>, StringBuilder> buildStringFromParams = (param, strings) =>
+            get
             {
-                foreach (var kvp in param)
+                if (this.ResponseCode >= HttpStatusCode.BadRequest)
                 {
-                    JsonConvert.SerializeObject(kvp.Key, Formatting.Indented);
-                    strings.AppendFormat("{0}={1}&", WebUtility.UrlEncode(kvp.Key), WebUtility.UrlEncode(kvp.Value));
+                    throw new MoceanErrorException(
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(
+                                _response
+                                    .Replace("<verify_request>", "")
+                                    .Replace("</verify_request>", "")
+                                    .Replace("<verify_check>", "")
+                                    .Replace("</verify_check>", "")
+                            ).SetRawResponse(_response)
+                    );
                 }
-            };
-            parameters.Add("mocean-api-key", mocean_api_key);
-            parameters.Add("mocean-api-secret", mocean_api_secret);
-            parameters.Add("mocean-medium", PL);
-            
-            // security secret provided, sort and sign request
-     
-            var sortedParams = new SortedDictionary<string, string>(parameters);
-            buildStringFromParams(sortedParams, sb);
-            
-            return sb;
-        }
-
-        internal static Dictionary<string, string> GetParameters(object parameters)
-        {
-            var paramType = parameters.GetType().GetTypeInfo();
-            var apiParams = new Dictionary<string, string>();
-            foreach (var property in paramType.GetProperties())
-            {
-                string jsonPropertyName = null;
-
-                if (property.GetCustomAttributes(typeof(JsonPropertyAttribute), false).Any())
-                {
-                    jsonPropertyName =
-                        ((JsonPropertyAttribute)property.GetCustomAttributes(typeof(JsonPropertyAttribute), false).First())
-                            .PropertyName;
-                }
-
-                if (null == paramType.GetProperty(property.Name).GetValue(parameters, null)) continue;
-
-                apiParams.Add(string.IsNullOrEmpty(jsonPropertyName) ? property.Name : jsonPropertyName,
-                    paramType.GetProperty(property.Name).GetValue(parameters, null).ToString());
+                return _response;
             }
-            return apiParams;
+            private set => _response = value;
         }
 
-        public static MoceanResponse HTTP_GET(string subdomain, Dictionary<string, string> parameters, Credentials creds)
+        public ApiRequest(string uri, string method, IDictionary<string, string> parameters)
         {
-            MoceanResponse mRes = new MoceanResponse();
+            this.Uri = uri;
+            if (method.Equals("get", StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.DoGetRequest(parameters);
+            }
+            else if (method.Equals("post", StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.DoPostRequest(parameters);
+            }
+        }
+
+        private void DoGetRequest(IDictionary<string, string> parameters)
+        {
             // Check all passed parameter is null or empty
-            if (string.IsNullOrEmpty(subdomain) || parameters == null || creds == null)
-                return mRes;
-            else
+            if (string.IsNullOrEmpty(this.Uri) || parameters == null)
             {
-                string url = REST_API + subdomain + "?" +BuildQueryString(parameters, creds);
-                
-                var request = (HttpWebRequest)WebRequest.Create(url);
-                var response = (HttpWebResponse)request.GetResponse();
-
-                mRes.HttpResponse = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                return mRes;
+                return;
             }
+
+            string url = REST_API + this.Uri + "?" + BuildQueryString(parameters);
+            var request = WebRequest.Create(url);
+
+            this.Response = this.ReadResponse(request);
         }
 
-        public static MoceanResponse HTTP_POST(string subdomain, Dictionary<string, string> parameters, Credentials creds)
+        private void DoPostRequest(IDictionary<string, string> parameters)
         {
-            byte[] data = null;
+            byte[] paramData = null;
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REST_API + subdomain);
+            var request = WebRequest.Create(REST_API + this.Uri);
 
             if (parameters != null)
             {
-                data = Encoding.ASCII.GetBytes(BuildQueryString(parameters, creds).ToString());
-
+                paramData = Encoding.ASCII.GetBytes(BuildQueryString(parameters).ToString());
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
+                request.ContentLength = paramData.Length;
 
                 using (var stream = request.GetRequestStream())
                 {
-                    stream.Write(data, 0, data.Length);
+                    stream.Write(paramData, 0, paramData.Length);
                 }
-
-                var response = (HttpWebResponse)request.GetResponse();
-
-                string responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                return new MoceanResponse
-                {
-                    HttpResponse = responseString
-                };
             }
-            else
+
+            this.Response = this.ReadResponse(request);
+        }
+
+        private string ReadResponse(WebRequest webRequest)
+        {
+            string res;
+
+            try
             {
-                return new MoceanResponse
+                using (WebResponse response = webRequest.GetResponse())
                 {
-                    HttpResponse = string.Empty
-                };
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    this.ResponseCode = httpResponse.StatusCode;
+                    using (Stream data = httpResponse.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        res = reader.ReadToEnd();
+                    }
+                }
             }
+            catch (WebException e)
+            {
+                using (WebResponse response = e.Response)
+                {
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    this.ResponseCode = httpResponse.StatusCode;
+                    using (Stream data = httpResponse.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        res = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            return res;
         }
 
-        internal static MoceanResponse DoGetRequest(string uri, object parameters, Credentials creds = null)
+        private StringBuilder BuildQueryString(IDictionary<string, string> parameters)
         {
-            var apiParams = GetParameters(parameters);
-            return DoGetRequest(uri, apiParams, creds);
-        }
+            parameters["mocean-medium"] = PL;
 
-        internal static MoceanResponse DoPostRequest(string uri, object parameters, Credentials creds = null)
-        {
-            var apiParams = GetParameters(parameters);
-            return DoPostRequest(uri, apiParams, creds);
-        }
+            var sortedParams = new SortedDictionary<string, string>(parameters);
+            var sb = new StringBuilder();
+            foreach (var kvp in sortedParams)
+            {
+                JsonConvert.SerializeObject(kvp.Key, Formatting.Indented);
+                sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(kvp.Key), WebUtility.UrlEncode(kvp.Value));
+            }
 
-        internal static MoceanResponse DoGetRequest(string uri, Dictionary<string, string> parameters, Credentials creds = null) => HTTP_GET(uri, parameters, creds);
-        internal static MoceanResponse DoPostRequest(string uri, Dictionary<string, string> parameters, Credentials creds = null) => HTTP_POST(uri, parameters, creds);
+            return sb;
+        }
     }
 }
