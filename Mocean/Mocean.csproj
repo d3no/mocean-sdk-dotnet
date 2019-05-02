@@ -72,6 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseFactory.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Verify\ChargeType.cs" />
     <Compile Include="Verify\SendCode.cs" />
     <Compile Include="Verify\Mapper\SendCodeRequest.cs" />
     <Compile Include="Verify\Mapper\SendCodeResponse.cs" />

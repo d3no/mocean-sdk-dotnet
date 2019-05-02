@@ -1,4 +1,5 @@
-﻿using MoceanTests;
+﻿using Mocean.Auth;
+using MoceanTests;
 using NUnit.Framework;
 
 namespace Mocean.Verify.Tests
@@ -63,6 +64,17 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_to, "test to");
             sendCodeRequest.mocean_resp_format = "json";
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
+        }
+
+        [Test]
+        public void SendCodeAsCPATest()
+        {
+            var mocean = new Client(new Basic("test api key", "test api secret"));
+            var sendCode = mocean.SendCode;
+            Assert.AreEqual(ChargeType.ChargePerConversion, sendCode.VerifyChargeType);
+            sendCode.SendAs(ChargeType.ChargePerAttempt);
+            Assert.AreEqual(ChargeType.ChargePerAttempt, sendCode.VerifyChargeType);
+            
         }
 
         [Test]
