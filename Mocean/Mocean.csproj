@@ -73,7 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseFactory.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Verify\ChargeType.cs" />
+    <Compile Include="Verify\Channel.cs" />
     <Compile Include="Verify\SendCode.cs" />
     <Compile Include="Verify\Mapper\SendCodeRequest.cs" />
     <Compile Include="Verify\Mapper\SendCodeResponse.cs" />
@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Compile Include="GenericModel.cs" />
     <None Include="Mocean.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

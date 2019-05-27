@@ -8,16 +8,17 @@ namespace Mocean.Verify
 {
     public class SendCode : AbstractClient
     {
-        public ChargeType VerifyChargeType { get; set; } = ChargeType.ChargePerConversion;
+        public Channel Channel { get; set; } = Channel.Auto;
+        public bool IsResend { get; set; } = false;
 
         public SendCode(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
             this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-to", "mocean-brand" };
         }
 
-        public SendCode SendAs(ChargeType chargeType)
+        public SendCode SendAs(Channel channel)
         {
-            this.VerifyChargeType = chargeType;
+            this.Channel = channel;
             return this;
         }
 
@@ -25,15 +26,36 @@ namespace Mocean.Verify
         {
             this.ValidatedAndParseFields(sendCode);
 
-            string verifyRequestUrl = "/verify/req";
-            if(this.VerifyChargeType == ChargeType.ChargePerAttempt)
+            StringBuilder verifyRequestUrl = new StringBuilder("/verify");
+            if (this.IsResend)
             {
-                verifyRequestUrl += "/sms";
+                verifyRequestUrl.Append("/resend");
+            }
+            else
+            {
+                verifyRequestUrl.Append("/req");
             }
 
-            string responseStr = this.ApiRequest.Post(verifyRequestUrl, this.parameters);
-            return (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(responseStr)
+            if (this.Channel == Channel.Sms)
+            {
+                verifyRequestUrl.Append("/sms");
+            }
+
+            string responseStr = this.ApiRequest.Post(verifyRequestUrl.ToString(), this.parameters);
+            var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(responseStr)
                 .SetRawResponse(responseStr);
+            sendCodeResponse.Client = this;
+
+            return sendCodeResponse;
+        }
+
+        public SendCodeResponse Resend(SendCodeRequest sendCode)
+        {
+            this.SendAs(Channel.Sms);
+            this.IsResend = true;
+            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-reqid" };
+
+            return this.Send(sendCode);
         }
     }
 }

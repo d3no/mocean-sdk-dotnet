@@ -97,7 +97,7 @@ namespace Mocean
             return this.FormatResponse(res, responseCode);
         }
 
-        protected string FormatResponse(string responseString, HttpStatusCode responseCode)
+        public string FormatResponse(string responseString, HttpStatusCode responseCode)
         {
             //remove these field for v1, no effect for v2
             string rawResponse = responseString
@@ -114,8 +114,8 @@ namespace Mocean
             }
 
             //these check is for v1 cause v1 http response code is not > 400, no effect for v2
-            var tempParsedObject = JObject.Parse(rawResponse);
-            if (tempParsedObject["status"] != null && !tempParsedObject["status"].ToString().Equals("0", StringComparison.InvariantCultureIgnoreCase))
+            var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(rawResponse);
+            if (tempParsedObject.Status != null && !tempParsedObject.Status.Equals("0", StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new MoceanErrorException(
                         (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(rawResponse).SetRawResponse(rawResponse)

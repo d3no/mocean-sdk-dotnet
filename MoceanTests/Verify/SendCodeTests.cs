@@ -21,6 +21,7 @@ namespace Mocean.Verify.Tests
                 mocean_pin_validity = "test pinvalidity",
                 mocean_template = "test template",
                 mocean_to = "test to",
+                mocean_reqid= "test req id",
                 mocean_resp_format = "json"
             };
 
@@ -38,6 +39,8 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_template, "test template");
             Assert.IsNotNull(sendCodeRequest.mocean_to);
             Assert.AreEqual(sendCodeRequest.mocean_to, "test to");
+            Assert.IsNotNull(sendCodeRequest.mocean_reqid);
+            Assert.AreEqual(sendCodeRequest.mocean_reqid, "test req id");
             Assert.IsNotNull(sendCodeRequest.mocean_resp_format);
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
 
@@ -49,6 +52,7 @@ namespace Mocean.Verify.Tests
             Assert.IsNull(sendCodeRequest.mocean_pin_validity);
             Assert.IsNull(sendCodeRequest.mocean_template);
             Assert.IsNull(sendCodeRequest.mocean_to);
+            Assert.IsNull(sendCodeRequest.mocean_reqid);
             Assert.IsNull(sendCodeRequest.mocean_resp_format);
             sendCodeRequest.mocean_brand = "test brand";
             Assert.AreEqual(sendCodeRequest.mocean_brand, "test brand");
@@ -64,6 +68,8 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_template, "test template");
             sendCodeRequest.mocean_to = "test to";
             Assert.AreEqual(sendCodeRequest.mocean_to, "test to");
+            sendCodeRequest.mocean_reqid = "test req id";
+            Assert.AreEqual(sendCodeRequest.mocean_reqid, "test req id");
             sendCodeRequest.mocean_resp_format = "json";
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
         }
@@ -89,14 +95,68 @@ namespace Mocean.Verify.Tests
         }
 
         [Test]
-        public void SendCodeAsCPATest()
+        public void SendCodeAsSmsTest()
         {
-            var mocean = new Client(new Basic("test api key", "test api secret"));
-            var sendCode = mocean.SendCode;
-            Assert.AreEqual(ChargeType.ChargePerConversion, sendCode.VerifyChargeType);
-            sendCode.SendAs(ChargeType.ChargePerAttempt);
-            Assert.AreEqual(ChargeType.ChargePerAttempt, sendCode.VerifyChargeType);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/req/sms", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("send_code.json"));
 
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var sendCode = mocean.SendCode;
+            Assert.AreEqual(Channel.Auto, sendCode.Channel);
+            sendCode.SendAs(Channel.Sms);
+            Assert.AreEqual(Channel.Sms, sendCode.Channel);
+
+        }
+
+        [Test]
+        public void ResendTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/resend/sms", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("send_code.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.SendCode.Resend(new SendCodeRequest
+            {
+                mocean_reqid = "test req id"
+            });
+        }
+
+        [Test]
+        public void ResendThroughResponseObjectTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/resend/sms", uri);
+                    Assert.AreEqual("CPASS_restapi_C0000002737000000.0002", parameters["mocean-reqid"]);
+                })
+                .Returns(() => TestingUtils.ReadFile("resend_code.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var sendCodeSampleResponse = TestingUtils.ReadFile("send_code.json");
+            var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(sendCodeSampleResponse)
+                .SetRawResponse(sendCodeSampleResponse);
+            sendCodeResponse.Client = mocean.SendCode;
+
+            var resendCodeResponse = sendCodeResponse.Resend();
+            Assert.AreEqual(resendCodeResponse.Status, "0");
+            Assert.AreEqual(resendCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
+            Assert.AreEqual(resendCodeResponse.To, "60123456789");
+            Assert.AreEqual(resendCodeResponse.ResendNumber, "1");
         }
 
         [Test]

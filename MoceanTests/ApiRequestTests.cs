@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using Mocean.Exceptions;
+using MoceanTests;
+using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -35,6 +37,82 @@ namespace Mocean.Tests
 
             var apiRequestObj = apiRequestMock.Object;
             Assert.AreEqual("testing only", apiRequestObj.Post("testing uri", new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void ErrorResponseWith2xxStatusCodeTest()
+        {
+            string jsonErrorResponse = TestingUtils.ReadFile("error_response.json");
+            var apiRequest = new ApiRequest();
+
+            try
+            {
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.Accepted);
+                Assert.Fail();
+            }
+            catch (MoceanErrorException ex)
+            {
+                Assert.AreEqual(ex.Message, ex.ErrorResponse.ToString());
+                Assert.AreEqual(jsonErrorResponse, ex.ErrorResponse.ToString());
+                Assert.AreEqual("1", ex.ErrorResponse.Status);
+            }
+
+            try
+            {
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.OK);
+                Assert.Fail();
+            }
+            catch (MoceanErrorException ex)
+            {
+                Assert.AreEqual(ex.Message, ex.ErrorResponse.ToString());
+                Assert.AreEqual(jsonErrorResponse, ex.ErrorResponse.ToString());
+                Assert.AreEqual("1", ex.ErrorResponse.Status);
+            }
+
+            string xmlErrorResponse = TestingUtils.ReadFile("error_response.xml");
+
+            try
+            {
+                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.Accepted);
+                Assert.Fail();
+            }
+            catch (MoceanErrorException ex)
+            {
+                Assert.AreEqual(ex.Message, ex.ErrorResponse.ToString());
+                Assert.AreEqual(xmlErrorResponse, ex.ErrorResponse.ToString());
+                Assert.AreEqual("1", ex.ErrorResponse.Status);
+            }
+
+            try
+            {
+                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.OK);
+                Assert.Fail();
+            }
+            catch (MoceanErrorException ex)
+            {
+                Assert.AreEqual(ex.Message, ex.ErrorResponse.ToString());
+                Assert.AreEqual(xmlErrorResponse, ex.ErrorResponse.ToString());
+                Assert.AreEqual("1", ex.ErrorResponse.Status);
+            }
+        }
+
+        [Test]
+        public void ErrorResponseWith4xxStatusCodeTest()
+        {
+            string jsonErrorResponse = TestingUtils.ReadFile("error_response.json");
+            var apiRequest = new ApiRequest();
+
+            try
+            {
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.BadRequest);
+                Assert.Fail();
+            }
+            catch (MoceanErrorException ex)
+            {
+                Assert.AreEqual(ex.Message, ex.ErrorResponse.ToString());
+                Assert.AreEqual(jsonErrorResponse, ex.ErrorResponse.ToString());
+                Assert.AreEqual("1", ex.ErrorResponse.Status);
+            }
         }
     }
 }

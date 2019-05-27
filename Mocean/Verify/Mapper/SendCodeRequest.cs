@@ -30,6 +30,9 @@ namespace Mocean.Verify
         [JsonProperty("mocean-next-event-wait")]
         public string mocean_next_event_wait { get; set; }
 
+        [JsonProperty("mocean-reqid")]
+        public string mocean_reqid { get; set; }
+
         [JsonProperty("mocean-resp-format")]
         public string mocean_resp_format { get; set; }
     }
