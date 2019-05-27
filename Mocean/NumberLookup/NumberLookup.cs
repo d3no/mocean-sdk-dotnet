@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Mocean.NumberLookup
 {
-    public class NumberLookup : MoceanFactory
+    public class NumberLookup : AbstractClient
     {
-        public NumberLookup(Client client) : base(client.Credentials)
+        public NumberLookup(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
             this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-to" };
         }
@@ -17,9 +17,10 @@ namespace Mocean.NumberLookup
         public NumberLookupResponse Inquiry(NumberLookupRequest numberLookup)
         {
             this.ValidatedAndParseFields(numberLookup);
-            var apiRequest = new ApiRequest("/nl", "get", this.parameters);
-            return (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(apiRequest.Response)
-                .SetRawResponse(apiRequest.Response);
+            
+            string responseStr = this.ApiRequest.Get("/nl", this.parameters);
+            return (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(responseStr)
+                .SetRawResponse(responseStr);
         }
     }
 }

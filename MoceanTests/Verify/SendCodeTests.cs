@@ -1,6 +1,8 @@
 ﻿using Mocean.Auth;
 using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Verify.Tests
 {
@@ -67,6 +69,26 @@ namespace Mocean.Verify.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/req", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("send_code.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.SendCode.Send(new SendCodeRequest
+            {
+                mocean_to = "testing to",
+                mocean_brand = "testing brand"
+            });
+        }
+
+        [Test]
         public void SendCodeAsCPATest()
         {
             var mocean = new Client(new Basic("test api key", "test api secret"));
@@ -74,7 +96,7 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(ChargeType.ChargePerConversion, sendCode.VerifyChargeType);
             sendCode.SendAs(ChargeType.ChargePerAttempt);
             Assert.AreEqual(ChargeType.ChargePerAttempt, sendCode.VerifyChargeType);
-            
+
         }
 
         [Test]
@@ -86,7 +108,7 @@ namespace Mocean.Verify.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -100,7 +122,13 @@ namespace Mocean.Verify.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(SendCodeResponse sendCodeResponse)
+        {
+            Assert.AreEqual(sendCodeResponse.Status, "0");
+            Assert.AreEqual(sendCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
         }
     }
 }

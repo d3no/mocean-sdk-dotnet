@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Message.Tests
 {
@@ -96,6 +98,27 @@ namespace Mocean.Message.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/sms", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("message.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.Sms.Send(new SmsRequest
+            {
+                mocean_from = "testing from",
+                mocean_text = "testing text",
+                mocean_to = "testing to"
+            });
+        }
+
+        [Test]
         public void JsonSmsResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("message.json");
@@ -104,7 +127,7 @@ namespace Mocean.Message.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Messages[0].Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -116,7 +139,14 @@ namespace Mocean.Message.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Messages[0].Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(SmsResponse smsResponse)
+        {
+            Assert.AreEqual(smsResponse.Messages[0].Status, "0");
+            Assert.AreEqual(smsResponse.Messages[0].Receiver, "60123456789");
+            Assert.AreEqual(smsResponse.Messages[0].MsgId, "CPASS_restapi_C0000002737000000.0001");
         }
     }
 }

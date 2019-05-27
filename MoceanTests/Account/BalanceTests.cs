@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Account.Tests
 {
@@ -24,6 +26,22 @@ namespace Mocean.Account.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/balance", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("balance.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.Balance.Inquiry();
+        }
+
+        [Test]
         public void JsonBalanceResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("balance.json");
@@ -32,7 +50,7 @@ namespace Mocean.Account.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -44,7 +62,13 @@ namespace Mocean.Account.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(BalanceResponse balanceResponse)
+        {
+            Assert.AreEqual(balanceResponse.Status, "0");
+            Assert.AreEqual(balanceResponse.Value, "100.0000");
         }
     }
 }

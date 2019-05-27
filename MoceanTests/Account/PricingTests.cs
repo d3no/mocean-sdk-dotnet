@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Account.Tests
 {
@@ -42,6 +44,22 @@ namespace Mocean.Account.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/pricing", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("price.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.Pricing.Inquiry();
+        }
+
+        [Test]
         public void JsonPricingResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("price.json");
@@ -50,7 +68,7 @@ namespace Mocean.Account.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -62,7 +80,19 @@ namespace Mocean.Account.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(PricingResponse pricingResponse)
+        {
+            Assert.AreEqual(pricingResponse.Status, "0");
+            Assert.AreEqual(pricingResponse.Destinations.Count, 25);
+            Assert.AreEqual(pricingResponse.Destinations[0].Country, "Default");
+            Assert.AreEqual(pricingResponse.Destinations[0].Operator, "Default");
+            Assert.AreEqual(pricingResponse.Destinations[0].Mcc, "Default");
+            Assert.AreEqual(pricingResponse.Destinations[0].Mnc, "Default");
+            Assert.AreEqual(pricingResponse.Destinations[0].Price, "2.0000");
+            Assert.AreEqual(pricingResponse.Destinations[0].Currency, "MYR");
         }
     }
 }

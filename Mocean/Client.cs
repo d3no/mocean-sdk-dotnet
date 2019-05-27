@@ -14,10 +14,14 @@ namespace Mocean
     public class Client
     {
         public IAuth Credentials { get; }
+        public ApiRequest ApiRequest { get; set; }
 
-        public Client(IAuth credentials)
+        public Client(IAuth credentials) : this(credentials, new ApiRequest(ApiRequestConfig.make())) { }
+
+        public Client(IAuth credentials, ApiRequest apiRequest)
         {
             this.Credentials = credentials;
+            this.ApiRequest = apiRequest;
 
             if (credentials.GetAuthMethod().Equals("basic", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -32,12 +36,12 @@ namespace Mocean
             }
         }
 
-        public Balance Balance { get => new Balance(this); }
-        public Pricing Pricing { get => new Pricing(this); }
-        public MessageStatus MessageStatus { get => new MessageStatus(this); }
-        public Sms Sms { get => new Sms(this); }
-        public SendCode SendCode { get => new SendCode(this); }
-        public VerifyCode VerifyCode { get => new VerifyCode(this); }
-        public NumberLookup.NumberLookup NumberLookup { get => new NumberLookup.NumberLookup(this); }
+        public Balance Balance { get => new Balance(this, this.ApiRequest); }
+        public Pricing Pricing { get => new Pricing(this, this.ApiRequest); }
+        public MessageStatus MessageStatus { get => new MessageStatus(this, this.ApiRequest); }
+        public Sms Sms { get => new Sms(this, this.ApiRequest); }
+        public SendCode SendCode { get => new SendCode(this, this.ApiRequest); }
+        public VerifyCode VerifyCode { get => new VerifyCode(this, this.ApiRequest); }
+        public NumberLookup.NumberLookup NumberLookup { get => new NumberLookup.NumberLookup(this, this.ApiRequest); }
     }
 }

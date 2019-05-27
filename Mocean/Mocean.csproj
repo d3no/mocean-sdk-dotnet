@@ -53,6 +53,7 @@
     <Compile Include="Account\Mapper\PricingRequest.cs" />
     <Compile Include="Account\Mapper\PricingResponse.cs" />
     <Compile Include="ApiRequest.cs" />
+    <Compile Include="ApiRequestConfig.cs" />
     <Compile Include="Auth\Basic.cs" />
     <Compile Include="Auth\IAuth.cs" />
     <Compile Include="Client.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Message\Sms.cs" />
     <Compile Include="Message\Mapper\SmsRequest.cs" />
     <Compile Include="Message\Mapper\SmsResponse.cs" />
-    <Compile Include="MoceanFactory.cs" />
+    <Compile Include="AbstractClient.cs" />
     <Compile Include="NumberLookup\NumberLookup.cs" />
     <Compile Include="NumberLookup\Mapper\NumberLookupRequest.cs" />
     <Compile Include="NumberLookup\Mapper\NumberLookupResponse.cs" />

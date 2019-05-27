@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Verify.Tests
 {
@@ -36,6 +38,26 @@ namespace Mocean.Verify.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/check", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("verify_code.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.VerifyCode.Send(new VerifyCodeRequest
+            {
+                mocean_code = "testing code",
+                mocean_reqid = "testing reqid"
+            });
+        }
+
+        [Test]
         public void JsonVerifyCodeResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("verify_code.json");
@@ -44,7 +66,7 @@ namespace Mocean.Verify.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -58,7 +80,16 @@ namespace Mocean.Verify.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(VerifyCodeResponse verifyCodeResponse)
+        {
+            Assert.AreEqual(verifyCodeResponse.Status, "0");
+            Assert.AreEqual(verifyCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
+            Assert.AreEqual(verifyCodeResponse.MsgId, "CPASS_restapi_C0000002737000000.0002");
+            Assert.AreEqual(verifyCodeResponse.Price, "0.35");
+            Assert.AreEqual(verifyCodeResponse.Currency, "MYR");
         }
     }
 }

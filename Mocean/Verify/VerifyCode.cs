@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mocean.Verify
 {
-    public class VerifyCode : MoceanFactory
+    public class VerifyCode : AbstractClient
     {
-        public VerifyCode(Client client) : base(client.Credentials)
+        public VerifyCode(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
             this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-reqid", "mocean-code" };
         }
@@ -16,11 +16,10 @@ namespace Mocean.Verify
         public VerifyCodeResponse Send(VerifyCodeRequest verifyCode)
         {
             this.ValidatedAndParseFields(verifyCode);
-            var apiRequest = new ApiRequest("/verify/check", "post", this.parameters);
-            return (VerifyCodeResponse)ResponseFactory.CreateObjectfromRawResponse<VerifyCodeResponse>(apiRequest.Response
-                    .Replace("<verify_check>", "")
-                    .Replace("</verify_check>", "")
-                ).SetRawResponse(apiRequest.Response);
+
+            string responseStr = this.ApiRequest.Post("/verify/check", this.parameters);
+            return (VerifyCodeResponse)ResponseFactory.CreateObjectfromRawResponse<VerifyCodeResponse>(responseStr)
+                .SetRawResponse(responseStr);
         }
     }
 }

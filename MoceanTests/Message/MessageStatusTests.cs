@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.Message.Tests
 {
@@ -30,6 +32,25 @@ namespace Mocean.Message.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/report/message", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("message_status.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.MessageStatus.Inquiry(new MessageStatusRequest
+            {
+                mocean_msgid = "test msg id"
+            });
+        }
+
+        [Test]
         public void JsonMessageStatusResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("message_status.json");
@@ -38,7 +59,7 @@ namespace Mocean.Message.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
         }
 
         [Test]
@@ -50,7 +71,15 @@ namespace Mocean.Message.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
+            this.TestObject(res);
+        }
+
+        private void TestObject(MessageStatusResponse messageStatusResponse)
+        {
+            Assert.AreEqual(messageStatusResponse.Status, "0");
+            Assert.AreEqual(messageStatusResponse.MessageStatus, "5");
+            Assert.AreEqual(messageStatusResponse.MsgId, "CPASS_restapi_C0000002737000000.0001");
+            Assert.AreEqual(messageStatusResponse.CreditDeducted, "0.0000");
         }
     }
 }

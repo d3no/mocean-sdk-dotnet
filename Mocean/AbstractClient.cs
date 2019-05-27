@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 
 namespace Mocean
 {
-    abstract public class MoceanFactory
+    abstract public class AbstractClient
     {
         protected IDictionary<string, string> parameters;
         protected List<string> requiredFields;
         protected IAuth credentials;
+        protected ApiRequest ApiRequest { get; private set; }
 
-        protected MoceanFactory(IAuth credentials)
+        protected AbstractClient(IAuth credentials, ApiRequest apiReqest)
         {
             this.credentials = credentials;
+            this.ApiRequest = apiReqest;
             this.parameters = new Dictionary<string, string>();
             this.requiredFields = new List<string>();
         }

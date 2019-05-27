@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Mocean.Account
 {
-    public class Pricing : MoceanFactory
+    public class Pricing : AbstractClient
     {
-        public Pricing(Client client) : base(client.Credentials)
+        public Pricing(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
             this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret" };
         }
@@ -17,9 +17,10 @@ namespace Mocean.Account
         public PricingResponse Inquiry(PricingRequest pricing = default(PricingRequest))
         {
             this.ValidatedAndParseFields(pricing);
-            var apiRequest = new ApiRequest("/account/pricing", "get", this.parameters);
-            return (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(apiRequest.Response)
-                .SetRawResponse(apiRequest.Response);
+
+            string responseStr = this.ApiRequest.Get("/account/pricing", this.parameters);
+            return (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(responseStr)
+                .SetRawResponse(responseStr);
         }
     }
 }

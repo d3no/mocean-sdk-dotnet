@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Mocean;
+using Mocean.Auth;
+using NUnit.Framework;
 using System.IO;
 using System.Text;
 
@@ -17,6 +19,16 @@ namespace MoceanTests
             }
 
             return text;
+        }
+
+        public static Client GetClientObj()
+        {
+            return TestingUtils.GetClientObj(new ApiRequest(ApiRequestConfig.make()));
+        }
+
+        public static Client GetClientObj(ApiRequest apiRequest)
+        {
+            return new Client(new Basic("test api key", "test api secret"), apiRequest);
         }
     }
 }

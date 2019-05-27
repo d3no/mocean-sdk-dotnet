@@ -1,5 +1,7 @@
 ﻿using MoceanTests;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Mocean.NumberLookup.Tests
 {
@@ -36,6 +38,25 @@ namespace Mocean.NumberLookup.Tests
         }
 
         [Test]
+        public void InquiryTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/nl", uri);
+                })
+                .Returns(() => TestingUtils.ReadFile("number_lookup.json"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            mocean.NumberLookup.Inquiry(new NumberLookupRequest
+            {
+                mocean_to = "testing to"
+            });
+        }
+
+        [Test]
         public void JsonNumberLookupResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("number_lookup.json");
@@ -44,8 +65,7 @@ namespace Mocean.NumberLookup.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), jsonResponse);
-            Assert.AreEqual(res.Status, "0");
-            Assert.AreEqual(res.OriginalCarrier.Country, "MY");
+            this.TestObject(res);
         }
 
         [Test]
@@ -57,8 +77,26 @@ namespace Mocean.NumberLookup.Tests
 
             Assert.IsInstanceOf(typeof(AbstractResponse), res);
             Assert.AreEqual(res.ToString(), xmlResponse);
-            Assert.AreEqual(res.Status, "0");
-            Assert.AreEqual(res.OriginalCarrier.Country, "MY");
+            this.TestObject(res);
+        }
+
+        private void TestObject(NumberLookupResponse numberLookupResponse)
+        {
+            Assert.AreEqual(numberLookupResponse.Status, "0");
+            Assert.AreEqual(numberLookupResponse.MsgId, "CPASS_restapi_C00000000000000.0002");
+            Assert.AreEqual(numberLookupResponse.To, "60123456789");
+            Assert.AreEqual(numberLookupResponse.Ported, "ported");
+            Assert.AreEqual(numberLookupResponse.Reachable, "reachable");
+            Assert.AreEqual(numberLookupResponse.CurrentCarrier.Country, "MY");
+            Assert.AreEqual(numberLookupResponse.CurrentCarrier.Name, "U Mobile");
+            Assert.AreEqual(numberLookupResponse.CurrentCarrier.NetworkCode, "50218");
+            Assert.AreEqual(numberLookupResponse.CurrentCarrier.Mcc, "502");
+            Assert.AreEqual(numberLookupResponse.CurrentCarrier.Mnc, "18");
+            Assert.AreEqual(numberLookupResponse.OriginalCarrier.Country, "MY");
+            Assert.AreEqual(numberLookupResponse.OriginalCarrier.Name, "Maxis Mobile");
+            Assert.AreEqual(numberLookupResponse.OriginalCarrier.NetworkCode, "50212");
+            Assert.AreEqual(numberLookupResponse.OriginalCarrier.Mcc, "502");
+            Assert.AreEqual(numberLookupResponse.OriginalCarrier.Mnc, "12");
         }
     }
 }

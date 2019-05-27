@@ -7,96 +7,72 @@ using System.Reflection;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Mocean.Exceptions;
+using Newtonsoft.Json.Linq;
 
 namespace Mocean
 {
     public class ApiRequest
     {
-        public const string REST_API = "https://rest.moceanapi.com/rest/1";
-        public const string PL = "DOTNET-SDK";
-        private string Uri { get; set; }
-        public HttpStatusCode ResponseCode { get; private set; }
-        private string _response;
-        public string Response
+        private ApiRequestConfig ApiRequestConfig { get; set; }
+
+        public ApiRequest(ApiRequestConfig apiRequestConfig)
         {
-            get
-            {
-                if (this.ResponseCode >= HttpStatusCode.BadRequest)
-                {
-                    throw new MoceanErrorException(
-                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(
-                                _response
-                                    .Replace("<verify_request>", "")
-                                    .Replace("</verify_request>", "")
-                                    .Replace("<verify_check>", "")
-                                    .Replace("</verify_check>", "")
-                            ).SetRawResponse(_response)
-                    );
-                }
-                return _response;
-            }
-            private set => _response = value;
+            this.ApiRequestConfig = apiRequestConfig;
         }
 
-        public ApiRequest(string uri, string method, IDictionary<string, string> parameters)
+        public ApiRequest() : this(ApiRequestConfig.make()) { }
+
+        public string Get(string uri, IDictionary<string, string> parameters)
         {
-            this.Uri = uri;
+            return this.Send("get", uri, parameters);
+        }
+
+        public string Post(string uri, IDictionary<string, string> parameters)
+        {
+            return this.Send("post", uri, parameters);
+        }
+
+        public virtual string Send(string method, string uri, IDictionary<string, string> parameters)
+        {
+            parameters["mocean-medium"] = "DOTNET-SDK";
+
+            //use json if default not set
+            if (!parameters.ContainsKey("mocean-resp-format"))
+            {
+                parameters["mocean-resp-format"] = "json";
+            }
+
+            WebRequest request;
             if (method.Equals("get", StringComparison.InvariantCultureIgnoreCase))
             {
-                this.DoGetRequest(parameters);
+                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + this.BuildQueryString(parameters));
             }
-            else if (method.Equals("post", StringComparison.InvariantCultureIgnoreCase))
+            else
             {
-                this.DoPostRequest(parameters);
-            }
-        }
+                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri);
 
-        private void DoGetRequest(IDictionary<string, string> parameters)
-        {
-            // Check all passed parameter is null or empty
-            if (string.IsNullOrEmpty(this.Uri) || parameters == null)
-            {
-                return;
-            }
-
-            string url = REST_API + this.Uri + "?" + BuildQueryString(parameters);
-            var request = WebRequest.Create(url);
-
-            this.Response = this.ReadResponse(request);
-        }
-
-        private void DoPostRequest(IDictionary<string, string> parameters)
-        {
-            byte[] paramData = null;
-
-            var request = WebRequest.Create(REST_API + this.Uri);
-
-            if (parameters != null)
-            {
-                paramData = Encoding.ASCII.GetBytes(BuildQueryString(parameters).ToString());
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = paramData.Length;
-
-                using (var stream = request.GetRequestStream())
+                if (parameters != null)
                 {
-                    stream.Write(paramData, 0, paramData.Length);
+                    var paramData = Encoding.ASCII.GetBytes(BuildQueryString(parameters).ToString());
+                    request.Method = "POST";
+                    request.ContentType = "application/x-www-form-urlencoded";
+                    request.ContentLength = paramData.Length;
+
+                    using (var stream = request.GetRequestStream())
+                    {
+                        stream.Write(paramData, 0, paramData.Length);
+                    }
                 }
             }
 
-            this.Response = this.ReadResponse(request);
-        }
-
-        private string ReadResponse(WebRequest webRequest)
-        {
             string res;
-
+            HttpStatusCode responseCode;
             try
             {
-                using (WebResponse response = webRequest.GetResponse())
+                using (WebResponse response = request.GetResponse())
                 {
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    this.ResponseCode = httpResponse.StatusCode;
+                    responseCode = httpResponse.StatusCode;
                     using (Stream data = httpResponse.GetResponseStream())
                     using (var reader = new StreamReader(data))
                     {
@@ -109,7 +85,7 @@ namespace Mocean
                 using (WebResponse response = e.Response)
                 {
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    this.ResponseCode = httpResponse.StatusCode;
+                    responseCode = httpResponse.StatusCode;
                     using (Stream data = httpResponse.GetResponseStream())
                     using (var reader = new StreamReader(data))
                     {
@@ -118,16 +94,41 @@ namespace Mocean
                 }
             }
 
-            return res;
+            return this.FormatResponse(res, responseCode);
+        }
+
+        protected string FormatResponse(string responseString, HttpStatusCode responseCode)
+        {
+            //remove these field for v1, no effect for v2
+            string rawResponse = responseString
+                .Replace("<verify_request>", "")
+                .Replace("</verify_request>", "")
+                .Replace("<verify_check>", "")
+                .Replace("</verify_check>", "");
+
+            if (responseCode >= HttpStatusCode.BadRequest)
+            {
+                throw new MoceanErrorException(
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(rawResponse).SetRawResponse(rawResponse)
+                    );
+            }
+
+            //these check is for v1 cause v1 http response code is not > 400, no effect for v2
+            var tempParsedObject = JObject.Parse(rawResponse);
+            if (tempParsedObject["status"] != null && !tempParsedObject["status"].ToString().Equals("0", StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new MoceanErrorException(
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(rawResponse).SetRawResponse(rawResponse)
+                    );
+            }
+
+            return rawResponse;
         }
 
         private StringBuilder BuildQueryString(IDictionary<string, string> parameters)
         {
-            parameters["mocean-medium"] = PL;
-
-            var sortedParams = new SortedDictionary<string, string>(parameters);
             var sb = new StringBuilder();
-            foreach (var kvp in sortedParams)
+            foreach (var kvp in parameters)
             {
                 JsonConvert.SerializeObject(kvp.Key, Formatting.Indented);
                 sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(kvp.Key), WebUtility.UrlEncode(kvp.Value));

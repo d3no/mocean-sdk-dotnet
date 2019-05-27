@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Mocean.Account
 {
-    public class Balance : MoceanFactory
+    public class Balance : AbstractClient
     {
-        public Balance(Client client) : base(client.Credentials)
+        public Balance(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
             this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret" };
         }
@@ -17,9 +17,10 @@ namespace Mocean.Account
         public BalanceResponse Inquiry(BalanceRequest balance = default(BalanceRequest))
         {
             this.ValidatedAndParseFields(balance);
-            var apiRequest = new ApiRequest("/account/balance", "get", this.parameters);
-            return (BalanceResponse)ResponseFactory.CreateObjectfromRawResponse<BalanceResponse>(apiRequest.Response)
-                .SetRawResponse(apiRequest.Response);
+
+            string responseStr = this.ApiRequest.Get("/account/balance", this.parameters);
+            return (BalanceResponse)ResponseFactory.CreateObjectfromRawResponse<BalanceResponse>(responseStr)
+                .SetRawResponse(responseStr);
         }
     }
 }
