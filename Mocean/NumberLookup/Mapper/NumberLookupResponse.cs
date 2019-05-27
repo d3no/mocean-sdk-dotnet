@@ -19,10 +19,6 @@ namespace Mocean.NumberLookup
         [XmlElement("to")]
         public string To { get; set; }
 
-        [JsonProperty("imsi")]
-        [XmlElement("imsi")]
-        public string Imsi { get; set; }
-
         [JsonProperty("current_carrier")]
         [XmlElement("current_carrier")]
         public Carrier CurrentCarrier { get; set; }
@@ -48,6 +44,18 @@ namespace Mocean.NumberLookup
             [JsonProperty("name")]
             [XmlElement("name")]
             public string Name { get; set; }
+
+            [JsonProperty("network_code")]
+            [XmlElement("network_code")]
+            public string NetworkCode { get; set; }
+
+            [JsonProperty("mcc")]
+            [XmlElement("mcc")]
+            public string Mcc { get; set; }
+
+            [JsonProperty("mnc")]
+            [XmlElement("mnc")]
+            public string Mnc { get; set; }
         }
     }
 }
