@@ -17,7 +17,7 @@ To install the C# client library using NuGet:
  - Run the following command in the Package Manager Console:
 
 ```bash
-Install-Package Mocean.Csharp.Client -Version 1.0.2.1
+Install-Package Mocean.Csharp.Client
 ```
 
 ## Usage
@@ -58,4 +58,4 @@ This library is released under the [MIT License][license]
 [doc_sms]: https://docs.moceanapi.com/?csharp#send-sms
 [doc_inbound]: https://docs.moceanapi.com/?csharp#receive-sms
 [doc_verify]: https://docs.moceanapi.com/?csharp#overview-3
-[license]: LICENSE.txt
+[license]: LICENSE.md

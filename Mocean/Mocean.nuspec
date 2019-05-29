@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Mocean.Csharp.Client</id>
+    <version>1.0.2.2</version>
+    <title>MoceanAPI</title>
+    <authors>Mocean</authors>
+    <owners>Mocean</owners>
+    <license type="file">LICENSE.md</license>
+    <projectUrl>https://github.com/MoceanAPI/mocean-sdk-dotnet</projectUrl>
+    <iconUrl>https://moceanapi.com/images/favicon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Official C#/.NET wrapper for the Mocean API</description>
+    <releaseNotes>
+      - Fix dependencies not being downloaded
+    </releaseNotes>
+    <copyright>© Copyright 2018-2019</copyright>
+    <tags>SMS phone moceanapi mocean</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="[12.0.0,13.0.0)"></dependency>
+      <dependency id="System.Net.Http" version="[4.0.0,5.0.0)"></dependency>
+      <dependency id="System.Net.Http.Formatting.Extension" version="[5.0.0,6.0.0)"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\LICENSE.md" target="" />
+    <file src="bin\Release\Mocean.dll" target="lib\Mocean.dll" />
+  </files>
+</package>
