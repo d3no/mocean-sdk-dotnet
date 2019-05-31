@@ -57,30 +57,72 @@ namespace Mocean.Account.Tests
 
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             mocean.Pricing.Inquiry();
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonPricingResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("price.json");
-            var res = (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/pricing", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/account/pricing"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlPricingResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("price.xml");
-            var res = (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(xmlResponse)
-                .SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/pricing", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/pricing"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
+
+
+            //V2 Test
+            xmlResponse = TestingUtils.ReadFile("price_v2.xml");
+            apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/pricing", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/pricing"));
+
+            apiRequestMock.Object.ApiRequestConfig.Version = "2";
+            mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            res = mocean.Pricing.Inquiry();
+            Assert.AreEqual(res.ToString(), xmlResponse);
+            this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(PricingResponse pricingResponse)

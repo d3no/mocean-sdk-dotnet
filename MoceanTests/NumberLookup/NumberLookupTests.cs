@@ -54,30 +54,58 @@ namespace Mocean.NumberLookup.Tests
             {
                 mocean_to = "testing to"
             });
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonNumberLookupResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("number_lookup.json");
-            var res = (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/nl", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/nl"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.NumberLookup.Inquiry(new NumberLookupRequest
+            {
+                mocean_to = "testing to"
+            });
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlNumberLookupResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("number_lookup.xml");
-            var res = (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(xmlResponse)
-                .SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/nl", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/nl"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.NumberLookup.Inquiry(new NumberLookupRequest
+            {
+                mocean_to = "testing to"
+            });
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(NumberLookupResponse numberLookupResponse)

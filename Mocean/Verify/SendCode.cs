@@ -43,7 +43,7 @@ namespace Mocean.Verify
 
             string responseStr = this.ApiRequest.Post(verifyRequestUrl.ToString(), this.parameters);
             var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
             sendCodeResponse.Client = this;
 
             return sendCodeResponse;

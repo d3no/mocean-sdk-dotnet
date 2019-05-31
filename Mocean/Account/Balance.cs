@@ -20,7 +20,7 @@ namespace Mocean.Account
 
             string responseStr = this.ApiRequest.Get("/account/balance", this.parameters);
             return (BalanceResponse)ResponseFactory.CreateObjectfromRawResponse<BalanceResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
         }
     }
 }

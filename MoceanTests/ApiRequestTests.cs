@@ -22,6 +22,8 @@ namespace Mocean.Tests
 
             var apiRequestObj = apiRequestMock.Object;
             Assert.AreEqual("testing only", apiRequestObj.Get("testing uri", new Dictionary<string, string>()));
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
@@ -37,6 +39,8 @@ namespace Mocean.Tests
 
             var apiRequestObj = apiRequestMock.Object;
             Assert.AreEqual("testing only", apiRequestObj.Post("testing uri", new Dictionary<string, string>()));
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
@@ -47,7 +51,7 @@ namespace Mocean.Tests
 
             try
             {
-                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.Accepted);
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.Accepted, false, null);
                 Assert.Fail();
             }
             catch (MoceanErrorException ex)
@@ -59,7 +63,7 @@ namespace Mocean.Tests
 
             try
             {
-                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.OK);
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.OK, false, null);
                 Assert.Fail();
             }
             catch (MoceanErrorException ex)
@@ -73,7 +77,7 @@ namespace Mocean.Tests
 
             try
             {
-                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.Accepted);
+                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.Accepted, false, null);
                 Assert.Fail();
             }
             catch (MoceanErrorException ex)
@@ -85,7 +89,7 @@ namespace Mocean.Tests
 
             try
             {
-                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.OK);
+                apiRequest.FormatResponse(xmlErrorResponse, System.Net.HttpStatusCode.OK, false, null);
                 Assert.Fail();
             }
             catch (MoceanErrorException ex)
@@ -104,7 +108,7 @@ namespace Mocean.Tests
 
             try
             {
-                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.BadRequest);
+                apiRequest.FormatResponse(jsonErrorResponse, System.Net.HttpStatusCode.BadRequest, false, null);
                 Assert.Fail();
             }
             catch (MoceanErrorException ex)

@@ -19,7 +19,7 @@ namespace Mocean.Message
 
             string responseStr = this.ApiRequest.Post("/sms", this.parameters);
             return (SmsResponse)ResponseFactory.CreateObjectfromRawResponse<SmsResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
         }
     }
 }

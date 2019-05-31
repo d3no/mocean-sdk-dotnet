@@ -19,7 +19,7 @@ namespace Mocean.Verify
 
             string responseStr = this.ApiRequest.Post("/verify/check", this.parameters);
             return (VerifyCodeResponse)ResponseFactory.CreateObjectfromRawResponse<VerifyCodeResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
         }
     }
 }

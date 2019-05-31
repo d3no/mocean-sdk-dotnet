@@ -48,30 +48,58 @@ namespace Mocean.Message.Tests
             {
                 mocean_msgid = "test msg id"
             });
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonMessageStatusResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("message_status.json");
-            var res = (MessageStatusResponse)ResponseFactory.CreateObjectfromRawResponse<MessageStatusResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/report/message", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/report/message"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.MessageStatus.Inquiry(new MessageStatusRequest
+            {
+                mocean_msgid = "test msg id"
+            });
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlMessageStatusResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("message_status.xml");
-            var res = (MessageStatusResponse)ResponseFactory.CreateObjectfromRawResponse<MessageStatusResponse>(xmlResponse)
-                .SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/report/message", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/report/message"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.MessageStatus.Inquiry(new MessageStatusRequest
+            {
+                mocean_msgid = "test msg id"
+            });
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(MessageStatusResponse messageStatusResponse)

@@ -20,7 +20,7 @@ namespace Mocean.Account
 
             string responseStr = this.ApiRequest.Get("/account/pricing", this.parameters);
             return (PricingResponse)ResponseFactory.CreateObjectfromRawResponse<PricingResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
         }
     }
 }

@@ -12,7 +12,8 @@ namespace Mocean.Message
     public class SmsResponse : AbstractResponse
     {
         [JsonProperty("messages")]
-        [XmlElement("message")]
+        [XmlArray("messages")]
+        [XmlArrayItem("message")]
         public List<Message> Messages { get; set; }
 
         [XmlRoot("message")]

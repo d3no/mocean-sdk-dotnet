@@ -39,30 +39,52 @@ namespace Mocean.Account.Tests
 
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             mocean.Balance.Inquiry();
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonBalanceResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("balance.json");
-            var res = (BalanceResponse)ResponseFactory.CreateObjectfromRawResponse<BalanceResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/balance", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/account/balance"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Balance.Inquiry();
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlBalanceResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("balance.xml");
-            var res = (BalanceResponse)ResponseFactory.CreateObjectfromRawResponse<BalanceResponse>(xmlResponse)
-                .SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("/account/balance", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/balance"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Balance.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(BalanceResponse balanceResponse)

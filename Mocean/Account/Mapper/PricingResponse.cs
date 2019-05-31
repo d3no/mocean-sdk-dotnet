@@ -12,7 +12,7 @@ namespace Mocean.Account
     public class PricingResponse : AbstractResponse
     {
         [JsonProperty("destinations")]
-        [XmlArray("data")]
+        [XmlArray("destinations")]
         [XmlArrayItem("destination")]
         public List<Destination> Destinations { get; set; }
 

@@ -13,7 +13,9 @@ namespace Mocean
 {
     public class ApiRequest
     {
-        private ApiRequestConfig ApiRequestConfig { get; set; }
+        public ApiRequestConfig ApiRequestConfig { get; set; }
+
+        public string RawResponse { get; private set; }
 
         public ApiRequest(ApiRequestConfig apiRequestConfig)
         {
@@ -94,35 +96,53 @@ namespace Mocean
                 }
             }
 
-            return this.FormatResponse(res, responseCode);
+            return this.FormatResponse(res, responseCode, parameters["mocean-resp-format"].Equals("xml", StringComparison.InvariantCultureIgnoreCase), uri);
         }
 
-        public string FormatResponse(string responseString, HttpStatusCode responseCode)
+        public string FormatResponse(string responseString, HttpStatusCode responseCode, bool isXml, string uri)
         {
+            this.RawResponse = responseString;
+
             //remove these field for v1, no effect for v2
-            string rawResponse = responseString
+            responseString = responseString
                 .Replace("<verify_request>", "")
                 .Replace("</verify_request>", "")
                 .Replace("<verify_check>", "")
                 .Replace("</verify_check>", "");
 
+            if (isXml && this.ApiRequestConfig.Version.Equals("1") && !string.IsNullOrEmpty(uri))
+            {
+                if (uri.Equals("/account/pricing", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    responseString = responseString
+                        .Replace("<data>", "<destinations>")
+                        .Replace("</data>", "</destinations>");
+                }
+                else if (uri.Equals("/sms", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    responseString = responseString
+                        .Replace("<result>", "<result><messages>")
+                        .Replace("</result>", "</messages></result>");
+                }
+            }
+
             if (responseCode >= HttpStatusCode.BadRequest)
             {
                 throw new MoceanErrorException(
-                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(rawResponse).SetRawResponse(rawResponse)
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(responseString).SetRawResponse(this.RawResponse)
                     );
             }
 
             //these check is for v1 cause v1 http response code is not > 400, no effect for v2
-            var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(rawResponse);
+            var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(responseString);
             if (tempParsedObject.Status != null && !tempParsedObject.Status.Equals("0", StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new MoceanErrorException(
-                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(rawResponse).SetRawResponse(rawResponse)
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(responseString).SetRawResponse(this.RawResponse)
                     );
             }
 
-            return rawResponse;
+            return responseString;
         }
 
         private StringBuilder BuildQueryString(IDictionary<string, string> parameters)

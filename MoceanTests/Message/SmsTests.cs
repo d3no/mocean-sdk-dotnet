@@ -116,30 +116,87 @@ namespace Mocean.Message.Tests
                 mocean_text = "testing text",
                 mocean_to = "testing to"
             });
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonSmsResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("message.json");
-            var res = (SmsResponse)ResponseFactory.CreateObjectfromRawResponse<SmsResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/sms", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/sms"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Sms.Send(new SmsRequest
+            {
+                mocean_from = "testing from",
+                mocean_text = "testing text",
+                mocean_to = "testing to"
+            });
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlSmsResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("message.xml");
-            var res = (SmsResponse)ResponseFactory.CreateObjectfromRawResponse<SmsResponse>(xmlResponse)
-                .SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/sms", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/sms"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.Sms.Send(new SmsRequest
+            {
+                mocean_from = "testing from",
+                mocean_text = "testing text",
+                mocean_to = "testing to"
+            });
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
+
+
+            //V2 Test
+            xmlResponse = TestingUtils.ReadFile("message_v2.xml");
+            apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/sms", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/sms"));
+
+            apiRequestMock.Object.ApiRequestConfig.Version = "2";
+            mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            res = mocean.Sms.Send(new SmsRequest
+            {
+                mocean_from = "testing from",
+                mocean_text = "testing text",
+                mocean_to = "testing to"
+            });
+            Assert.AreEqual(res.ToString(), xmlResponse);
+            this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(SmsResponse smsResponse)

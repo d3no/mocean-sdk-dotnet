@@ -20,7 +20,7 @@ namespace Mocean.NumberLookup
             
             string responseStr = this.ApiRequest.Get("/nl", this.parameters);
             return (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(responseStr)
-                .SetRawResponse(responseStr);
+                .SetRawResponse(this.ApiRequest.RawResponse);
         }
     }
 }

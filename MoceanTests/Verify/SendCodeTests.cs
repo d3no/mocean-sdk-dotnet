@@ -92,6 +92,8 @@ namespace Mocean.Verify.Tests
                 mocean_to = "testing to",
                 mocean_brand = "testing brand"
             });
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
@@ -111,7 +113,13 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(Channel.Auto, sendCode.Channel);
             sendCode.SendAs(Channel.Sms);
             Assert.AreEqual(Channel.Sms, sendCode.Channel);
+            sendCode.Send(new SendCodeRequest
+            {
+                mocean_to = "testing to",
+                mocean_brand = "testing brand"
+            });
 
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
@@ -131,6 +139,8 @@ namespace Mocean.Verify.Tests
             {
                 mocean_reqid = "test req id"
             });
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
@@ -157,32 +167,60 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(resendCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
             Assert.AreEqual(resendCodeResponse.To, "60123456789");
             Assert.AreEqual(resendCodeResponse.ResendNumber, "1");
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void JsonSendCodeResponseTest()
         {
             string jsonResponse = TestingUtils.ReadFile("send_code.json");
-            var res = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(jsonResponse)
-                .SetRawResponse(jsonResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/req", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/verify/req"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.SendCode.Send(new SendCodeRequest
+            {
+                mocean_to = "testing to",
+                mocean_brand = "testing brand"
+            });
             Assert.AreEqual(res.ToString(), jsonResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void XmlSendCodeResponseTest()
         {
             string xmlResponse = TestingUtils.ReadFile("send_code.xml");
-            var res = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(xmlResponse
-                    .Replace("<verify_request>", "")
-                    .Replace("</verify_request>", "")
-                ).SetRawResponse(xmlResponse);
 
-            Assert.IsInstanceOf(typeof(AbstractResponse), res);
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+                {
+                    Assert.AreEqual("post", method);
+                    Assert.AreEqual("/verify/req", uri);
+                })
+                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/verify/req"));
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var res = mocean.SendCode.Send(new SendCodeRequest
+            {
+                mocean_to = "testing to",
+                mocean_brand = "testing brand"
+            });
             Assert.AreEqual(res.ToString(), xmlResponse);
             this.TestObject(res);
+
+            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private void TestObject(SendCodeResponse sendCodeResponse)
