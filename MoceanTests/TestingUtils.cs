@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MoceanTests
 {
-    public class TestingUtils
+    public static class TestingUtils
     {
         public static string ReadFile(string fileName)
         {

@@ -13,17 +13,17 @@ namespace Mocean.Tests
         {
             Assert.Throws<RequiredFieldException>(() =>
             {
-                Client client = new Client(new Basic("test api key", ""));
+                new Client(new Basic("test api key", ""));
             });
 
             Assert.Throws<RequiredFieldException>(() =>
             {
-                Client client = new Client(new Basic("", "test api secret"));
+                new Client(new Basic("", "test api secret"));
             });
 
             Assert.Throws<RequiredFieldException>(() =>
             {
-                Client client = new Client(new Basic());
+                new Client(new Basic());
             });
         }
 

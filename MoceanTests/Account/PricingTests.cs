@@ -78,7 +78,7 @@ namespace Mocean.Account.Tests
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -100,7 +100,7 @@ namespace Mocean.Account.Tests
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
 
@@ -120,12 +120,12 @@ namespace Mocean.Account.Tests
             mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(PricingResponse pricingResponse)
+        private static void TestObject(PricingResponse pricingResponse)
         {
             Assert.AreEqual(pricingResponse.Status, "0");
             Assert.AreEqual(pricingResponse.Destinations.Count, 25);

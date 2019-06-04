@@ -10,7 +10,7 @@ namespace Mocean.Verify
     {
         public VerifyCode(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
-            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-reqid", "mocean-code" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret", "mocean-reqid", "mocean-code" };
         }
 
         public VerifyCodeResponse Send(VerifyCodeRequest verifyCode)

@@ -11,7 +11,7 @@ namespace Mocean.NumberLookup
     {
         public NumberLookup(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
-            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-to" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret", "mocean-to" };
         }
 
         public NumberLookupResponse Inquiry(NumberLookupRequest numberLookup)

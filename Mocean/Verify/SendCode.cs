@@ -9,11 +9,11 @@ namespace Mocean.Verify
     public class SendCode : AbstractClient
     {
         public Channel Channel { get; set; } = Channel.Auto;
-        public bool IsResend { get; set; } = false;
+        public bool IsResend { get; set; }
 
         public SendCode(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
-            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-to", "mocean-brand" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret", "mocean-to", "mocean-brand" };
         }
 
         public SendCode SendAs(Channel channel)
@@ -53,7 +53,7 @@ namespace Mocean.Verify
         {
             this.SendAs(Channel.Sms);
             this.IsResend = true;
-            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret", "mocean-reqid" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret", "mocean-reqid" };
 
             return this.Send(sendCode);
         }

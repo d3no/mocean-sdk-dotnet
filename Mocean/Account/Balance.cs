@@ -11,7 +11,7 @@ namespace Mocean.Account
     {
         public Balance(Client client, ApiRequest apiRequest) : base(client.Credentials, apiRequest)
         {
-            this.requiredFields = new List<string>() { "mocean-api-key", "mocean-api-secret" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret" };
         }
 
         public BalanceResponse Inquiry(BalanceRequest balance = default(BalanceRequest))

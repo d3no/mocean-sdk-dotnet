@@ -78,7 +78,7 @@ namespace Mocean.NumberLookup.Tests
                 mocean_to = "testing to"
             });
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -103,12 +103,12 @@ namespace Mocean.NumberLookup.Tests
                 mocean_to = "testing to"
             });
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(NumberLookupResponse numberLookupResponse)
+        private static void TestObject(NumberLookupResponse numberLookupResponse)
         {
             Assert.AreEqual(numberLookupResponse.Status, "0");
             Assert.AreEqual(numberLookupResponse.MsgId, "CPASS_restapi_C00000000000000.0002");

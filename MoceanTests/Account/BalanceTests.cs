@@ -60,7 +60,7 @@ namespace Mocean.Account.Tests
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Balance.Inquiry();
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -82,12 +82,12 @@ namespace Mocean.Account.Tests
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Balance.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(BalanceResponse balanceResponse)
+        private static void TestObject(BalanceResponse balanceResponse)
         {
             Assert.AreEqual(balanceResponse.Status, "0");
             Assert.AreEqual(balanceResponse.Value, "100.0000");

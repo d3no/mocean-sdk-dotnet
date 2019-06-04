@@ -47,7 +47,7 @@ namespace Mocean
             WebRequest request;
             if (method.Equals("get", StringComparison.InvariantCultureIgnoreCase))
             {
-                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + this.BuildQueryString(parameters));
+                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters));
             }
             else
             {
@@ -102,9 +102,10 @@ namespace Mocean
         public string FormatResponse(string responseString, HttpStatusCode responseCode, bool isXml, string uri)
         {
             this.RawResponse = responseString;
+            var tempString = responseString;
 
             //remove these field for v1, no effect for v2
-            responseString = responseString
+            tempString = tempString
                 .Replace("<verify_request>", "")
                 .Replace("</verify_request>", "")
                 .Replace("<verify_check>", "")
@@ -114,13 +115,13 @@ namespace Mocean
             {
                 if (uri.Equals("/account/pricing", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    responseString = responseString
+                    tempString = tempString
                         .Replace("<data>", "<destinations>")
                         .Replace("</data>", "</destinations>");
                 }
                 else if (uri.Equals("/sms", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    responseString = responseString
+                    tempString = tempString
                         .Replace("<result>", "<result><messages>")
                         .Replace("</result>", "</messages></result>");
                 }
@@ -129,23 +130,23 @@ namespace Mocean
             if (responseCode >= HttpStatusCode.BadRequest)
             {
                 throw new MoceanErrorException(
-                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(responseString).SetRawResponse(this.RawResponse)
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(tempString).SetRawResponse(this.RawResponse)
                     );
             }
 
             //these check is for v1 cause v1 http response code is not > 400, no effect for v2
-            var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(responseString);
+            var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(tempString);
             if (tempParsedObject.Status != null && !tempParsedObject.Status.Equals("0", StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new MoceanErrorException(
-                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(responseString).SetRawResponse(this.RawResponse)
+                        (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(tempString).SetRawResponse(this.RawResponse)
                     );
             }
 
-            return responseString;
+            return tempString;
         }
 
-        private StringBuilder BuildQueryString(IDictionary<string, string> parameters)
+        private static StringBuilder BuildQueryString(IDictionary<string, string> parameters)
         {
             var sb = new StringBuilder();
             foreach (var kvp in parameters)

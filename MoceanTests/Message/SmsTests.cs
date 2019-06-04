@@ -142,7 +142,7 @@ namespace Mocean.Message.Tests
                 mocean_to = "testing to"
             });
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -169,7 +169,7 @@ namespace Mocean.Message.Tests
                 mocean_to = "testing to"
             });
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
 
@@ -194,12 +194,12 @@ namespace Mocean.Message.Tests
                 mocean_to = "testing to"
             });
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(SmsResponse smsResponse)
+        private static void TestObject(SmsResponse smsResponse)
         {
             Assert.AreEqual(smsResponse.Messages[0].Status, "0");
             Assert.AreEqual(smsResponse.Messages[0].Receiver, "60123456789");

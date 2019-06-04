@@ -80,7 +80,7 @@ namespace Mocean.Verify.Tests
                 mocean_reqid = "testing reqid"
             });
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -106,12 +106,12 @@ namespace Mocean.Verify.Tests
                 mocean_reqid = "testing reqid"
             });
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(VerifyCodeResponse verifyCodeResponse)
+        private static void TestObject(VerifyCodeResponse verifyCodeResponse)
         {
             Assert.AreEqual(verifyCodeResponse.Status, "0");
             Assert.AreEqual(verifyCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");

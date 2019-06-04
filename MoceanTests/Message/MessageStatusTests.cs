@@ -72,7 +72,7 @@ namespace Mocean.Message.Tests
                 mocean_msgid = "test msg id"
             });
             Assert.AreEqual(res.ToString(), jsonResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
@@ -97,12 +97,12 @@ namespace Mocean.Message.Tests
                 mocean_msgid = "test msg id"
             });
             Assert.AreEqual(res.ToString(), xmlResponse);
-            this.TestObject(res);
+            TestObject(res);
 
             apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
-        private void TestObject(MessageStatusResponse messageStatusResponse)
+        private static void TestObject(MessageStatusResponse messageStatusResponse)
         {
             Assert.AreEqual(messageStatusResponse.Status, "0");
             Assert.AreEqual(messageStatusResponse.MessageStatus, "5");
