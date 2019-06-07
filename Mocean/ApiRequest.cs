@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Mocean.Exceptions;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace Mocean
 {
@@ -44,59 +45,23 @@ namespace Mocean
                 parameters["mocean-resp-format"] = "json";
             }
 
-            WebRequest request;
-            if (method.Equals("get", StringComparison.InvariantCultureIgnoreCase))
-            {
-                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters));
-            }
-            else
-            {
-                request = WebRequest.Create(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri);
-
-                if (parameters != null)
-                {
-                    var paramData = Encoding.ASCII.GetBytes(BuildQueryString(parameters).ToString());
-                    request.Method = "POST";
-                    request.ContentType = "application/x-www-form-urlencoded";
-                    request.ContentLength = paramData.Length;
-
-                    using (var stream = request.GetRequestStream())
-                    {
-                        stream.Write(paramData, 0, paramData.Length);
-                    }
-                }
-            }
-
+            HttpResponseMessage response;
             string res;
-            HttpStatusCode responseCode;
-            try
+            using (var httpClient = new HttpClient())
             {
-                using (WebResponse response = request.GetResponse())
+                if(method.Equals("get", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    responseCode = httpResponse.StatusCode;
-                    using (Stream data = httpResponse.GetResponseStream())
-                    using (var reader = new StreamReader(data))
-                    {
-                        res = reader.ReadToEnd();
-                    }
+                    response = httpClient.GetAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters)).Result;
                 }
-            }
-            catch (WebException e)
-            {
-                using (WebResponse response = e.Response)
+                else
                 {
-                    HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    responseCode = httpResponse.StatusCode;
-                    using (Stream data = httpResponse.GetResponseStream())
-                    using (var reader = new StreamReader(data))
-                    {
-                        res = reader.ReadToEnd();
-                    }
+                    response = httpClient.PostAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri, new FormUrlEncodedContent(parameters)).Result;
                 }
+
+                res = response.Content.ReadAsStringAsync().Result;
             }
 
-            return this.FormatResponse(res, responseCode, parameters["mocean-resp-format"].Equals("xml", StringComparison.InvariantCultureIgnoreCase), uri);
+            return this.FormatResponse(res, response.StatusCode, parameters["mocean-resp-format"].Equals("xml", StringComparison.CurrentCultureIgnoreCase), uri);
         }
 
         public string FormatResponse(string responseString, HttpStatusCode responseCode, bool isXml, string uri)
@@ -113,13 +78,13 @@ namespace Mocean
 
             if (isXml && this.ApiRequestConfig.Version.Equals("1") && !string.IsNullOrEmpty(uri))
             {
-                if (uri.Equals("/account/pricing", StringComparison.InvariantCultureIgnoreCase))
+                if (uri.Equals("/account/pricing", StringComparison.CurrentCultureIgnoreCase))
                 {
                     tempString = tempString
                         .Replace("<data>", "<destinations>")
                         .Replace("</data>", "</destinations>");
                 }
-                else if (uri.Equals("/sms", StringComparison.InvariantCultureIgnoreCase))
+                else if (uri.Equals("/sms", StringComparison.CurrentCultureIgnoreCase))
                 {
                     tempString = tempString
                         .Replace("<result>", "<result><messages>")
@@ -136,7 +101,7 @@ namespace Mocean
 
             //these check is for v1 cause v1 http response code is not > 400, no effect for v2
             var tempParsedObject = ResponseFactory.CreateObjectfromRawResponse<GenericModel>(tempString);
-            if (tempParsedObject.Status != null && !tempParsedObject.Status.Equals("0", StringComparison.InvariantCultureIgnoreCase))
+            if (tempParsedObject.Status != null && !tempParsedObject.Status.Equals("0", StringComparison.CurrentCultureIgnoreCase))
             {
                 throw new MoceanErrorException(
                         (ErrorResponse)ResponseFactory.CreateObjectfromRawResponse<ErrorResponse>(tempString).SetRawResponse(this.RawResponse)

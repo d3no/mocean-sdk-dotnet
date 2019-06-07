@@ -23,7 +23,7 @@ namespace Mocean
             this.Credentials = credentials;
             this.ApiRequest = apiRequest;
 
-            if (credentials.GetAuthMethod().Equals("basic", StringComparison.InvariantCultureIgnoreCase))
+            if (credentials.GetAuthMethod().Equals("basic", StringComparison.CurrentCultureIgnoreCase))
             {
                 if (String.IsNullOrEmpty(credentials.GetParams()["mocean-api-key"]) || String.IsNullOrEmpty(credentials.GetParams()["mocean-api-secret"]))
                 {
