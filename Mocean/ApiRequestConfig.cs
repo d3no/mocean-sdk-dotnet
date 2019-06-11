@@ -3,7 +3,7 @@
     public class ApiRequestConfig
     {
         public string BaseUrl { get; set; } = "https://rest.moceanapi.com";
-        public string Version { get; set; } = "1";
+        public string Version { get; set; } = "2";
 
         public ApiRequestConfig() { }
 

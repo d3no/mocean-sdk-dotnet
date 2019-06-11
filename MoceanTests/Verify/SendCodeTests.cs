@@ -22,6 +22,7 @@ namespace Mocean.Verify.Tests
                 mocean_template = "test template",
                 mocean_to = "test to",
                 mocean_reqid= "test req id",
+                mocean_request_nl = "test request nl",
                 mocean_resp_format = "json"
             };
 
@@ -41,6 +42,8 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_to, "test to");
             Assert.IsNotNull(sendCodeRequest.mocean_reqid);
             Assert.AreEqual(sendCodeRequest.mocean_reqid, "test req id");
+            Assert.IsNotNull(sendCodeRequest.mocean_request_nl);
+            Assert.AreEqual(sendCodeRequest.mocean_request_nl, "test request nl");
             Assert.IsNotNull(sendCodeRequest.mocean_resp_format);
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
 
@@ -53,6 +56,7 @@ namespace Mocean.Verify.Tests
             Assert.IsNull(sendCodeRequest.mocean_template);
             Assert.IsNull(sendCodeRequest.mocean_to);
             Assert.IsNull(sendCodeRequest.mocean_reqid);
+            Assert.IsNull(sendCodeRequest.mocean_request_nl);
             Assert.IsNull(sendCodeRequest.mocean_resp_format);
             sendCodeRequest.mocean_brand = "test brand";
             Assert.AreEqual(sendCodeRequest.mocean_brand, "test brand");
@@ -70,6 +74,8 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_to, "test to");
             sendCodeRequest.mocean_reqid = "test req id";
             Assert.AreEqual(sendCodeRequest.mocean_reqid, "test req id");
+            sendCodeRequest.mocean_request_nl = "test request nl";
+            Assert.AreEqual(sendCodeRequest.mocean_request_nl, "test request nl");
             sendCodeRequest.mocean_resp_format = "json";
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
         }

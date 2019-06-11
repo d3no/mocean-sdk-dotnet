@@ -97,6 +97,7 @@ namespace Mocean.Account.Tests
                 })
                 .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/pricing"));
 
+            apiRequestMock.Object.ApiRequestConfig.Version = "1";
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Pricing.Inquiry();
             Assert.AreEqual(res.ToString(), xmlResponse);

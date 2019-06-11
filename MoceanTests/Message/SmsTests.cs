@@ -161,6 +161,7 @@ namespace Mocean.Message.Tests
                 })
                 .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/sms"));
 
+            apiRequestMock.Object.ApiRequestConfig.Version = "1";
             var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
             var res = mocean.Sms.Send(new SmsRequest
             {
