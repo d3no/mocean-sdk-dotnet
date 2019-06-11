@@ -44,7 +44,7 @@ namespace Mocean.NumberLookup.Tests
             apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
                 .Callback((string method, string uri, IDictionary<string, string> parameters) =>
                 {
-                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("post", method);
                     Assert.AreEqual("/nl", uri);
                 })
                 .Returns(() => TestingUtils.ReadFile("number_lookup.json"));
@@ -67,7 +67,7 @@ namespace Mocean.NumberLookup.Tests
             apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
                 .Callback((string method, string uri, IDictionary<string, string> parameters) =>
                 {
-                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("post", method);
                     Assert.AreEqual("/nl", uri);
                 })
                 .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/nl"));
@@ -92,7 +92,7 @@ namespace Mocean.NumberLookup.Tests
             apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
                 .Callback((string method, string uri, IDictionary<string, string> parameters) =>
                 {
-                    Assert.AreEqual("get", method);
+                    Assert.AreEqual("post", method);
                     Assert.AreEqual("/nl", uri);
                 })
                 .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/nl"));

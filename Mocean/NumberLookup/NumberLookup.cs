@@ -18,7 +18,7 @@ namespace Mocean.NumberLookup
         {
             this.ValidatedAndParseFields(numberLookup);
             
-            string responseStr = this.ApiRequest.Get("/nl", this.parameters);
+            string responseStr = this.ApiRequest.Post("/nl", this.parameters);
             return (NumberLookupResponse)ResponseFactory.CreateObjectfromRawResponse<NumberLookupResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);
         }
