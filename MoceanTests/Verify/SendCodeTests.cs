@@ -1,4 +1,5 @@
 ﻿using Mocean.Auth;
+using Mocean.Exceptions;
 using MoceanTests;
 using Moq;
 using NUnit.Framework;
@@ -78,6 +79,21 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(sendCodeRequest.mocean_request_nl, "test request nl");
             sendCodeRequest.mocean_resp_format = "json";
             Assert.AreEqual(sendCodeRequest.mocean_resp_format, "json");
+        }
+
+        [Test]
+        public void RequiredFieldNotSetTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Returns("testing only");
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            Assert.Throws<RequiredFieldException>(() =>
+            {
+                mocean.SendCode.Send(new SendCodeRequest());
+            });
+
         }
 
         [Test]

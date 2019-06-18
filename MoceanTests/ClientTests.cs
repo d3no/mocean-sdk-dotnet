@@ -1,5 +1,6 @@
 ﻿using Mocean.Auth;
 using Mocean.Exceptions;
+using MoceanTests;
 using NUnit.Framework;
 using System;
 
@@ -37,6 +38,19 @@ namespace Mocean.Tests
             catch (Exception e)
             {
                 Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void CreateClientWithUnsupportedCredentialTest()
+        {
+            try
+            {
+                new Client(new DummyCredentials());
+                Assert.Fail("created client with unsupported credential");
+            }
+            catch (MoceanErrorException)
+            {
             }
         }
     }

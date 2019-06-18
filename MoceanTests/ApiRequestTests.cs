@@ -118,5 +118,17 @@ namespace Mocean.Tests
                 Assert.AreEqual("1", ex.ErrorResponse.Status);
             }
         }
+
+        [Test]
+        public void BuildQueryStringTest()
+        {
+            var result = ApiRequest.BuildQueryString(new Dictionary<string, string>()
+            {
+                {"test", "testing"},
+                {"test2", "testing2"}
+            });
+
+            Assert.AreEqual("test=testing&test2=testing2", result.ToString());
+        }
     }
 }

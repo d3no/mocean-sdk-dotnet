@@ -41,11 +41,6 @@ namespace Mocean
             }
         }
 
-        protected void Reset()
-        {
-            this.parameters = new Dictionary<string, string>();
-        }
-
         private void PutCredentials()
         {
             this.parameters["mocean-api-key"] = this.credentials.GetParams()["mocean-api-key"];

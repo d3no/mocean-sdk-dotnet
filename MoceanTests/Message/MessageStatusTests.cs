@@ -1,4 +1,5 @@
-﻿using MoceanTests;
+﻿using Mocean.Exceptions;
+using MoceanTests;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -29,6 +30,21 @@ namespace Mocean.Message.Tests
             Assert.AreEqual(messageStatusRequest.mocean_msgid, "test msgid");
             messageStatusRequest.mocean_resp_format = "json";
             Assert.AreEqual(messageStatusRequest.mocean_resp_format, "json");
+        }
+
+        [Test]
+        public void RequiredFieldNotSetTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Returns("testing only");
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            Assert.Throws<RequiredFieldException>(() =>
+            {
+                mocean.MessageStatus.Inquiry(new MessageStatusRequest());
+            });
+            
         }
 
         [Test]

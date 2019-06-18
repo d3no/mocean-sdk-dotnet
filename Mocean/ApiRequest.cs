@@ -111,13 +111,18 @@ namespace Mocean
             return tempString;
         }
 
-        private static StringBuilder BuildQueryString(IDictionary<string, string> parameters)
+        public static StringBuilder BuildQueryString(IDictionary<string, string> parameters)
         {
             var sb = new StringBuilder();
             foreach (var kvp in parameters)
             {
                 JsonConvert.SerializeObject(kvp.Key, Formatting.Indented);
-                sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(kvp.Key), WebUtility.UrlEncode(kvp.Value));
+                if (sb.Length > 0)
+                {
+                    sb.Append("&");
+                }
+
+                sb.AppendFormat("{0}={1}", WebUtility.UrlEncode(kvp.Key), WebUtility.UrlEncode(kvp.Value));
             }
 
             return sb;

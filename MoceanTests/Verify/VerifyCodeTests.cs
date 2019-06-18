@@ -1,4 +1,5 @@
-﻿using MoceanTests;
+﻿using Mocean.Exceptions;
+using MoceanTests;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -35,6 +36,21 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(verifyCodeRequest.mocean_reqid, "test reqid");
             verifyCodeRequest.mocean_resp_format = "json";
             Assert.AreEqual(verifyCodeRequest.mocean_resp_format, "json");
+        }
+
+        [Test]
+        public void RequiredFieldNotSetTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Returns("testing only");
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            Assert.Throws<RequiredFieldException>(() =>
+            {
+                mocean.VerifyCode.Send(new VerifyCodeRequest());
+            });
+
         }
 
         [Test]
@@ -115,9 +131,6 @@ namespace Mocean.Verify.Tests
         {
             Assert.AreEqual(verifyCodeResponse.Status, "0");
             Assert.AreEqual(verifyCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
-            Assert.AreEqual(verifyCodeResponse.MsgId, "CPASS_restapi_C0000002737000000.0002");
-            Assert.AreEqual(verifyCodeResponse.Price, "0.35");
-            Assert.AreEqual(verifyCodeResponse.Currency, "MYR");
         }
     }
 }

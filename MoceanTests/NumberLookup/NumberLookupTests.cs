@@ -1,4 +1,5 @@
-﻿using MoceanTests;
+﻿using Mocean.Exceptions;
+using MoceanTests;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -35,6 +36,21 @@ namespace Mocean.NumberLookup.Tests
             Assert.AreEqual(numberLookupRequest.mocean_nl_url, "test nlurl");
             numberLookupRequest.mocean_resp_format = "json";
             Assert.AreEqual(numberLookupRequest.mocean_resp_format, "json");
+        }
+
+        [Test]
+        public void RequiredFieldNotSetTest()
+        {
+            var apiRequestMock = new Mock<ApiRequest>();
+            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
+                .Returns("testing only");
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            Assert.Throws<RequiredFieldException>(() =>
+            {
+                mocean.NumberLookup.Inquiry(new NumberLookupRequest());
+            });
+
         }
 
         [Test]
