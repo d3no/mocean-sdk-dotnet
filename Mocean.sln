@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2018
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoceanWindowFormTest", "MoceanWindowFormTest\MoceanWindowFormTest.csproj", "{F24164EA-FDBF-430C-AEBA-E93BED017917}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocean", "Mocean\Mocean.csproj", "{77AB75C8-4763-4269-984F-F3E19F59D664}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocean", "Mocean\Mocean.csproj", "{D13BB1D0-909B-41BD-9A31-086882B9AFC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoceanTests", "MoceanTests\MoceanTests.csproj", "{C1CE3E8A-2DB7-4A93-803E-B7AEE03DA522}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoceanASPCoreTest", "MoceanASPCoreTest\MoceanASPCoreTest.csproj", "{9183CCB5-078C-427C-A807-C4C9D9F41CD6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git Items", "Git Items", "{9C890CA3-6D04-4555-9CE2-33DDD279C435}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,23 +20,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F24164EA-FDBF-430C-AEBA-E93BED017917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F24164EA-FDBF-430C-AEBA-E93BED017917}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F24164EA-FDBF-430C-AEBA-E93BED017917}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F24164EA-FDBF-430C-AEBA-E93BED017917}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D13BB1D0-909B-41BD-9A31-086882B9AFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D13BB1D0-909B-41BD-9A31-086882B9AFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D13BB1D0-909B-41BD-9A31-086882B9AFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D13BB1D0-909B-41BD-9A31-086882B9AFC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9183CCB5-078C-427C-A807-C4C9D9F41CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9183CCB5-078C-427C-A807-C4C9D9F41CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9183CCB5-078C-427C-A807-C4C9D9F41CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9183CCB5-078C-427C-A807-C4C9D9F41CD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77AB75C8-4763-4269-984F-F3E19F59D664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AB75C8-4763-4269-984F-F3E19F59D664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AB75C8-4763-4269-984F-F3E19F59D664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77AB75C8-4763-4269-984F-F3E19F59D664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1CE3E8A-2DB7-4A93-803E-B7AEE03DA522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1CE3E8A-2DB7-4A93-803E-B7AEE03DA522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1CE3E8A-2DB7-4A93-803E-B7AEE03DA522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1CE3E8A-2DB7-4A93-803E-B7AEE03DA522}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FB20253B-6537-44F9-9D16-D672A3D51E6E}
+		SolutionGuid = {4538D9A1-8408-4BAD-B9FD-B8B1A48921A3}
 	EndGlobalSection
 EndGlobal

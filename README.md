@@ -1,5 +1,8 @@
 MoceanAPI Client Library for C#/.NET
 ============================
+[![Latest Stable Version](https://img.shields.io/nuget/v/Mocean.Csharp.Client.svg)](https://www.nuget.org/packages/Mocean.Csharp.Client/)
+[![Build Status](https://travis-ci.org/MoceanAPI/mocean-sdk-dotnet.svg?branch=master)](https://travis-ci.org/MoceanAPI/mocean-sdk-dotnet)
+[![Total Downloads](https://img.shields.io/nuget/dt/Mocean.Csharp.Client.svg)](https://www.nuget.org/packages/Mocean.Csharp.Client/)
 
 This is the C# client library for use Mocean's API. To use this, you'll need a Mocean account. Sign up [for free at 
 moceanapi.com][signup].
