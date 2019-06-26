@@ -3,7 +3,7 @@ MoceanAPI Client Library for C#/.NET
 [![Latest Stable Version](https://img.shields.io/nuget/v/Mocean.Csharp.Client.svg)](https://www.nuget.org/packages/Mocean.Csharp.Client/)
 [![Build Status](https://img.shields.io/travis/com/MoceanAPI/mocean-sdk-dotnet.svg)](https://travis-ci.com/MoceanAPI/mocean-sdk-dotnet)
 [![codecov](https://img.shields.io/codecov/c/github/MoceanAPI/mocean-sdk-dotnet.svg)](https://codecov.io/gh/MoceanAPI/mocean-sdk-dotnet)
-[![codacy](https://img.shields.io/codacy/grade/0168b869e59145c0af715901ae2865ae.svg)](https://app.codacy.com/project/MoceanAPI/mocean-sdk-dotnet/dashboard)
+[![codacy](https://img.shields.io/codacy/grade/0915168c1277416fbd512a47d7069082.svg)](https://app.codacy.com/project/MoceanAPI/mocean-sdk-dotnet/dashboard)
 [![License](https://img.shields.io/packagist/l/mocean/client.svg)](https://packagist.org/packages/mocean/client)
 [![Total Downloads](https://img.shields.io/nuget/dt/Mocean.Csharp.Client.svg)](https://www.nuget.org/packages/Mocean.Csharp.Client/)
 

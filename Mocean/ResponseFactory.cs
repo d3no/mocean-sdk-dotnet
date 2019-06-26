@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace Mocean
 {
-    public class ResponseFactory
+    public static class ResponseFactory
     {
         public static T CreateObjectfromRawResponse<T>(string rawResponse)
         {

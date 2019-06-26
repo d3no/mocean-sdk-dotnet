@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mocean
 {
-    public class Utils
+    public static class Utils
     {
         public static IDictionary<string, string> ConvertClassToDictionary(object className)
         {

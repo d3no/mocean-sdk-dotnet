@@ -122,7 +122,7 @@ namespace Mocean.Tests
         [Test]
         public void BuildQueryStringTest()
         {
-            var result = ApiRequest.BuildQueryString(new Dictionary<string, string>()
+            var result = ApiRequest.BuildQueryString(new Dictionary<string, string>
             {
                 {"test", "testing"},
                 {"test2", "testing2"}
