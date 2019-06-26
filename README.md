@@ -40,7 +40,7 @@ var client = new Client(credentials);
 
 ## Example
 
-To use [Mocean's SMS API][doc_sms] to send an SMS message, call the `client.sms.send()` method.
+To use [Mocean's SMS API][doc_sms] to send an SMS message, call the `client.Sms.Send()` method.
 
 The API can be called directly, using a simple array of parameters, the keys match the [parameters of the API][doc_sms].
 
