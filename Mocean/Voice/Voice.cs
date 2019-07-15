@@ -18,20 +18,6 @@ namespace Mocean.Voice
         {
             this.ValidatedAndParseFields(voice);
 
-            //Dictionary<string, string> tmp = new Dictionary<string, string>();
-            //foreach (KeyValuePair<string, string> kvp in this.parameters)
-            //{
-            //    tmp.Add(kvp.Key.Replace("mocean", "gw"), kvp.Value);
-            //}
-
-            //this.parameters = tmp;
-
-            //foreach (KeyValuePair<string, string> kvp in this.parameters)
-            //{
-            //    Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-            //}
-            //Environment.Exit(1);
-
             string responseStr = this.ApiRequest.Get("/voice/dial", this.parameters);
             return (VoiceResponse)ResponseFactory.CreateObjectfromRawResponse<VoiceResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);
