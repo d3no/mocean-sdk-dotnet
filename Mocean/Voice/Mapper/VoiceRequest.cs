@@ -20,21 +20,27 @@ namespace Mocean.Voice.Mapper
         {
             get
             {
-                if (_callControlCommands is McccBuilder)
+                var builderCallControlCommands = _callControlCommands as McccBuilder;
+                if(builderCallControlCommands != null)
                 {
                     return JsonConvert.SerializeObject(((McccBuilder)_callControlCommands).build());
                 }
-                if (_callControlCommands is AbstractMccc)
+
+                var objCallControlCommands = _callControlCommands as AbstractMccc;
+                if(objCallControlCommands != null)
                 {
                     return JsonConvert.SerializeObject((new McccBuilder()).add((AbstractMccc)_callControlCommands).build());
                 }
-                if (_callControlCommands is Dictionary<string, object>)
+
+                var dictCallControlCommands = _callControlCommands as Dictionary<string, object>;
+                if(dictCallControlCommands != null)
                 {
                     return JsonConvert.SerializeObject(new List<Dictionary<string, object>>
                     {
                         (Dictionary<string, object>)_callControlCommands
                     });
                 }
+
                 return _callControlCommands;
             }
             set

@@ -22,6 +22,7 @@ namespace MoceanTests.Voice
             }
             catch (Exception)
             {
+                // required field check pass when comes here
             }
 
             say.Text = "testing text";
@@ -41,6 +42,7 @@ namespace MoceanTests.Voice
             }
             catch (Exception)
             {
+                // required field check pass when comes here
             }
 
             bridge.To = "testing to";
@@ -60,6 +62,7 @@ namespace MoceanTests.Voice
             }
             catch (Exception)
             {
+                // required field check pass when comes here
             }
 
             collect.EventUrl = "testing event url";
@@ -79,6 +82,7 @@ namespace MoceanTests.Voice
             }
             catch (Exception)
             {
+                // required field check pass when comes here
             }
 
             play.File = "testing file";
@@ -98,6 +102,7 @@ namespace MoceanTests.Voice
             }
             catch (Exception)
             {
+                // required field check pass when comes here
             }
 
             sleep.Duration = 10000;

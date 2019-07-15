@@ -49,7 +49,7 @@ namespace MoceanTests.Voice
             Assert.AreEqual(voiceRequest.mocean_resp_format, "json");
 
             //test multiple types of mocean_call_event_url
-            var dictionaryParams = new Dictionary<string, object>() { { "action", "say" } };
+            var dictionaryParams = new Dictionary<string, object> { { "action", "say" } };
             voiceRequest.mocean_call_control_commands = dictionaryParams;
             Assert.AreEqual(voiceRequest.mocean_call_control_commands, JsonConvert.SerializeObject(new List<Dictionary<string, object>>
                     {
@@ -63,7 +63,7 @@ namespace MoceanTests.Voice
             Assert.AreEqual(JsonConvert.SerializeObject(builderParams.build()), voiceRequest.mocean_call_control_commands);
 
             voiceRequest = new VoiceRequest();
-            var mcccParams = new Say() { Text = "hello world" };
+            var mcccParams = new Say { Text = "hello world" };
             voiceRequest.mocean_call_control_commands = mcccParams;
             Assert.IsNotNull(voiceRequest.mocean_call_control_commands);
             Assert.AreEqual(JsonConvert.SerializeObject((new McccBuilder()).add(mcccParams).build()), voiceRequest.mocean_call_control_commands);

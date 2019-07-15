@@ -8,23 +8,23 @@ namespace Mocean.Voice
 {
     public class McccBuilder
     {
-        protected List<AbstractMccc> mccc;
+        protected List<AbstractMccc> mcccList;
 
         public McccBuilder()
         {
-            this.mccc = new List<AbstractMccc>();
+            this.mcccList = new List<AbstractMccc>();
         }
 
         public McccBuilder add(AbstractMccc mccc)
         {
-            this.mccc.Add(mccc);
+            this.mcccList.Add(mccc);
             return this;
         }
 
         public List<Dictionary<string, object>> build()
         {
             List<Dictionary<string, object>> converted = new List<Dictionary<string, object>>();
-            foreach (AbstractMccc mccc in this.mccc)
+            foreach (AbstractMccc mccc in this.mcccList)
             {
                 converted.Add(mccc.GetRequestData());
             }

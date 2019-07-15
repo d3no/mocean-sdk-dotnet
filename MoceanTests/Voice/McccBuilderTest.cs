@@ -14,7 +14,7 @@ namespace MoceanTests.Voice
         [Test]
         public void AddTest()
         {
-            var play = new Play()
+            var play = new Play
             {
                 File = "testing file"
             };

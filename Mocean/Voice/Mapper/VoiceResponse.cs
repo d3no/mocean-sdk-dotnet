@@ -11,10 +11,6 @@ namespace Mocean.Voice.Mapper
     [XmlRoot("result")]
     public class VoiceResponse : AbstractResponse
     {
-        [JsonProperty("to")]
-        [XmlElement("to")]
-        public string To { get; set; }
-
         [JsonProperty("session-uuid")]
         [XmlElement("session-uuid")]
         public string SessionUuid { get; set; }
