@@ -1,8 +1,7 @@
 ﻿using Mocean.Exceptions;
 using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.Message.Tests
 {
@@ -35,87 +34,62 @@ namespace Mocean.Message.Tests
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("message_status.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.MessageStatus.Inquiry(new MessageStatusRequest());
             });
-            
+
         }
 
         [Test]
-        public void InquiryTest()
+        public void JsonInquiryTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/report/message", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/report/message"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("message_status.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("message_status.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.MessageStatus.Inquiry(new MessageStatusRequest
-            {
-                mocean_msgid = "test msg id"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void JsonMessageStatusResponseTest()
-        {
-            string jsonResponse = TestingUtils.ReadFile("message_status.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/report/message", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/report/message"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.MessageStatus.Inquiry(new MessageStatusRequest
             {
                 mocean_msgid = "test msg id"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("message_status.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlMessageStatusResponseTest()
+        public void XmlInquiryTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("message_status.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/report/message", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/report/message"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("message_status.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/report/message"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.MessageStatus.Inquiry(new MessageStatusRequest
             {
-                mocean_msgid = "test msg id"
+                mocean_msgid = "test msg id",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("message_status.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(MessageStatusResponse messageStatusResponse)

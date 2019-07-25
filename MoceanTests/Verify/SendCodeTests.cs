@@ -1,9 +1,7 @@
-﻿using Mocean.Auth;
-using Mocean.Exceptions;
+﻿using Mocean.Exceptions;
 using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.Verify.Tests
 {
@@ -22,7 +20,7 @@ namespace Mocean.Verify.Tests
                 mocean_pin_validity = "test pinvalidity",
                 mocean_template = "test template",
                 mocean_to = "test to",
-                mocean_reqid= "test req id",
+                mocean_reqid = "test req id",
                 mocean_request_nl = "test request nl",
                 mocean_resp_format = "json"
             };
@@ -84,11 +82,14 @@ namespace Mocean.Verify.Tests
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("send_code.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.SendCode.Send(new SendCodeRequest());
@@ -97,40 +98,18 @@ namespace Mocean.Verify.Tests
         }
 
         [Test]
-        public void InquiryTest()
-        {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/req", uri);
-                })
-                .Returns(() => TestingUtils.ReadFile("send_code.json"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.SendCode.Send(new SendCodeRequest
-            {
-                mocean_to = "testing to",
-                mocean_brand = "testing brand"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
         public void SendCodeAsSmsTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/req/sms", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/req/sms"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("send_code.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("send_code.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var sendCode = mocean.SendCode;
             Assert.AreEqual(Channel.Auto, sendCode.Channel);
             sendCode.SendAs(Channel.Sms);
@@ -140,48 +119,44 @@ namespace Mocean.Verify.Tests
                 mocean_to = "testing to",
                 mocean_brand = "testing brand"
             });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void ResendTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/resend/sms", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/resend/sms"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("resend_code.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("send_code.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             mocean.SendCode.Resend(new SendCodeRequest
             {
                 mocean_reqid = "test req id"
             });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
         public void ResendThroughResponseObjectTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/resend/sms", uri);
-                    Assert.AreEqual("CPASS_restapi_C0000002737000000.0002", parameters["mocean-reqid"]);
+                    var dictBody = TestingUtils.RewindBody(httpRequest.Content);
+                    Assert.AreEqual("CPASS_restapi_C0000002737000000.0002", dictBody["mocean-reqid"]);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/resend/sms"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("resend_code.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("resend_code.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            var sendCodeSampleResponse = TestingUtils.ReadFile("send_code.json");
-            var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(sendCodeSampleResponse)
-                .SetRawResponse(sendCodeSampleResponse);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
+            var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(TestingUtils.ReadFile("resend_code.json"))
+                .SetRawResponse(TestingUtils.ReadFile("resend_code.json"));
             sendCodeResponse.Client = mocean.SendCode;
 
             var resendCodeResponse = sendCodeResponse.Resend();
@@ -189,60 +164,51 @@ namespace Mocean.Verify.Tests
             Assert.AreEqual(resendCodeResponse.ReqId, "CPASS_restapi_C0000002737000000.0002");
             Assert.AreEqual(resendCodeResponse.To, "60123456789");
             Assert.AreEqual(resendCodeResponse.ResendNumber, "1");
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void JsonSendCodeResponseTest()
+        public void JsonSendTest()
         {
-            string jsonResponse = TestingUtils.ReadFile("send_code.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/req", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/req"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("send_code.json");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/verify/req"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.SendCode.Send(new SendCodeRequest
             {
                 mocean_to = "testing to",
                 mocean_brand = "testing brand"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("send_code.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlSendCodeResponseTest()
+        public void XmlSendTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("send_code.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/req", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/req"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("send_code.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/verify/req"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.SendCode.Send(new SendCodeRequest
             {
                 mocean_to = "testing to",
-                mocean_brand = "testing brand"
+                mocean_brand = "testing brand",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("send_code.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(SendCodeResponse sendCodeResponse)

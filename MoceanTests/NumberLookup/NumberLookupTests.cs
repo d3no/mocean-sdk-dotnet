@@ -1,8 +1,7 @@
 ﻿using Mocean.Exceptions;
 using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.NumberLookup.Tests
 {
@@ -41,11 +40,14 @@ namespace Mocean.NumberLookup.Tests
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("number_lookup.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.NumberLookup.Inquiry(new NumberLookupRequest());
@@ -54,74 +56,46 @@ namespace Mocean.NumberLookup.Tests
         }
 
         [Test]
-        public void InquiryTest()
+        public void JsonInquiryTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/nl", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/nl"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("number_lookup.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("number_lookup.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.NumberLookup.Inquiry(new NumberLookupRequest
-            {
-                mocean_to = "testing to"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void JsonNumberLookupResponseTest()
-        {
-            string jsonResponse = TestingUtils.ReadFile("number_lookup.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/nl", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/nl"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.NumberLookup.Inquiry(new NumberLookupRequest
             {
                 mocean_to = "testing to"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("number_lookup.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlNumberLookupResponseTest()
+        public void XmlInquiryTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("number_lookup.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/nl", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/nl"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("number_lookup.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/nl"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.NumberLookup.Inquiry(new NumberLookupRequest
             {
-                mocean_to = "testing to"
+                mocean_to = "testing to",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("number_lookup.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(NumberLookupResponse numberLookupResponse)
