@@ -49,15 +49,15 @@ namespace Mocean
 
             HttpResponseMessage response;
             string res;
-            using (var httpClient = this.httpClient)
+            using (var tempHttpClient = this.httpClient)
             {
                 if (method.Equals("get", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    response = httpClient.GetAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters)).Result;
+                    response = tempHttpClient.GetAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters)).Result;
                 }
                 else
                 {
-                    response = httpClient.PostAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri, new FormUrlEncodedContent(parameters)).Result;
+                    response = tempHttpClient.PostAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri, new FormUrlEncodedContent(parameters)).Result;
                 }
 
                 res = response.Content.ReadAsStringAsync().Result;
