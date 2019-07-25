@@ -2,14 +2,10 @@
 using Mocean.Exceptions;
 using Mocean.Voice;
 using Mocean.Voice.Mapper;
-using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace MoceanTests.Voice
 {
@@ -72,11 +68,14 @@ namespace MoceanTests.Voice
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("voice.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.Voice.Call(new VoiceRequest());
@@ -85,74 +84,46 @@ namespace MoceanTests.Voice
         }
 
         [Test]
-        public void CallTest()
+        public void JsonCallTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/voice/dial", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/dial"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("voice.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("voice.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.Voice.Call(new VoiceRequest
-            {
-                mocean_to = "testing to"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void JsonNumberLookupResponseTest()
-        {
-            string jsonResponse = TestingUtils.ReadFile("voice.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/voice/dial", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/voice/dial"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.Voice.Call(new VoiceRequest
             {
                 mocean_to = "testing to"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("voice.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlNumberLookupResponseTest()
+        public void XmlCallTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("voice.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/voice/dial", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/dial"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("voice.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/voice/dial"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.Voice.Call(new VoiceRequest
             {
-                mocean_to = "testing to"
+                mocean_to = "testing to",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("voice.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(VoiceResponse voiceResponse)

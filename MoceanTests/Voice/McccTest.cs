@@ -1,10 +1,5 @@
 ﻿using Mocean.Voice;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MoceanTests.Voice
 {
@@ -15,16 +10,6 @@ namespace MoceanTests.Voice
         public void McccSayTest()
         {
             var say = Mccc.say();
-            try
-            {
-                say.GetRequestData();
-                Assert.Fail();
-            }
-            catch (Exception)
-            {
-                // required field check pass when comes here
-            }
-
             say.Text = "testing text";
             Assert.AreEqual("testing text", say.GetRequestData()["text"]);
 
@@ -35,16 +20,6 @@ namespace MoceanTests.Voice
         public void McccBridgeTest()
         {
             var bridge = Mccc.bridge();
-            try
-            {
-                bridge.GetRequestData();
-                Assert.Fail();
-            }
-            catch (Exception)
-            {
-                // required field check pass when comes here
-            }
-
             bridge.To = "testing to";
             Assert.AreEqual("testing to", bridge.GetRequestData()["to"]);
 
@@ -55,16 +30,6 @@ namespace MoceanTests.Voice
         public void McccCollectTest()
         {
             var collect = Mccc.collect();
-            try
-            {
-                collect.GetRequestData();
-                Assert.Fail();
-            }
-            catch (Exception)
-            {
-                // required field check pass when comes here
-            }
-
             collect.EventUrl = "testing event url";
             Assert.AreEqual("testing event url", collect.GetRequestData()["event-url"]);
 
@@ -75,16 +40,6 @@ namespace MoceanTests.Voice
         public void McccPlayTest()
         {
             var play = Mccc.play();
-            try
-            {
-                play.GetRequestData();
-                Assert.Fail();
-            }
-            catch (Exception)
-            {
-                // required field check pass when comes here
-            }
-
             play.File = "testing file";
             Assert.AreEqual("testing file", play.GetRequestData()["file"]);
 
@@ -95,16 +50,6 @@ namespace MoceanTests.Voice
         public void McccSleepTest()
         {
             var sleep = Mccc.sleep();
-            try
-            {
-                sleep.GetRequestData();
-                Assert.Fail();
-            }
-            catch (Exception)
-            {
-                // required field check pass when comes here
-            }
-
             sleep.Duration = 10000;
             Assert.AreEqual(10000, sleep.GetRequestData()["duration"]);
 
