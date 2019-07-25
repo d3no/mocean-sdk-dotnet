@@ -1,8 +1,7 @@
 ﻿using Mocean.Exceptions;
 using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.Verify.Tests
 {
@@ -41,11 +40,14 @@ namespace Mocean.Verify.Tests
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("verify_code.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.VerifyCode.Send(new VerifyCodeRequest());
@@ -54,77 +56,48 @@ namespace Mocean.Verify.Tests
         }
 
         [Test]
-        public void InquiryTest()
+        public void JsonSendTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/check", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/check"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("verify_code.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("verify_code.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.VerifyCode.Send(new VerifyCodeRequest
-            {
-                mocean_code = "testing code",
-                mocean_reqid = "testing reqid"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void JsonVerifyCodeResponseTest()
-        {
-            string jsonResponse = TestingUtils.ReadFile("verify_code.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/check", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/verify/check"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.VerifyCode.Send(new VerifyCodeRequest
             {
                 mocean_code = "testing code",
                 mocean_reqid = "testing reqid"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("verify_code.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlVerifyCodeResponseTest()
+        public void XmlSendTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("verify_code.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/verify/check", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/verify/check"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("verify_code.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/verify/check"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.VerifyCode.Send(new VerifyCodeRequest
             {
                 mocean_code = "testing code",
-                mocean_reqid = "testing reqid"
+                mocean_reqid = "testing reqid",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("verify_code.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(VerifyCodeResponse verifyCodeResponse)

@@ -1,8 +1,7 @@
 ﻿using Mocean.Exceptions;
 using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.Message.Tests
 {
@@ -101,11 +100,14 @@ namespace Mocean.Message.Tests
         [Test]
         public void RequiredFieldNotSetTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Returns("testing only");
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    return TestingUtils.GetResponse("message.json");
+                })
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<RequiredFieldException>(() =>
             {
                 mocean.Sms.Send(new SmsRequest());
@@ -114,106 +116,73 @@ namespace Mocean.Message.Tests
         }
 
         [Test]
-        public void InquiryTest()
+        public void JsonSendTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/sms", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/sms"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("message.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("message.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.Sms.Send(new SmsRequest
-            {
-                mocean_from = "testing from",
-                mocean_text = "testing text",
-                mocean_to = "testing to"
-            });
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void JsonSmsResponseTest()
-        {
-            string jsonResponse = TestingUtils.ReadFile("message.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/sms", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/sms"));
-
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.Sms.Send(new SmsRequest
             {
                 mocean_from = "testing from",
                 mocean_text = "testing text",
                 mocean_to = "testing to"
             });
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("message.json"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         [Test]
-        public void XmlSmsResponseTest()
+        public void XmlSendTest()
         {
-            string xmlResponse = TestingUtils.ReadFile("message.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/sms", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/sms", "1"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("message.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/sms"));
+            );
 
-            apiRequestMock.Object.ApiRequestConfig.Version = "1";
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            apiRequestMock.ApiRequestConfig.Version = "1";
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
             var res = mocean.Sms.Send(new SmsRequest
             {
                 mocean_from = "testing from",
                 mocean_text = "testing text",
-                mocean_to = "testing to"
+                mocean_to = "testing to",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("message.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-
 
             //V2 Test
-            xmlResponse = TestingUtils.ReadFile("message_v2.xml");
-            apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("post", method);
-                    Assert.AreEqual("/sms", uri);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/sms"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("message_v2.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/sms"));
+            );
 
-            apiRequestMock.Object.ApiRequestConfig.Version = "2";
-            mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
+            apiRequestMock.ApiRequestConfig.Version = "2";
+            mocean = TestingUtils.GetClientObj(apiRequestMock);
             res = mocean.Sms.Send(new SmsRequest
             {
                 mocean_from = "testing from",
                 mocean_text = "testing text",
-                mocean_to = "testing to"
+                mocean_to = "testing to",
+                mocean_resp_format = "xml"
             });
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("message_v2.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(SmsResponse smsResponse)

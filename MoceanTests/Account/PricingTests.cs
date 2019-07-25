@@ -1,7 +1,6 @@
 ﻿using MoceanTests;
-using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Mocean.Account.Tests
 {
@@ -44,86 +43,62 @@ namespace Mocean.Account.Tests
         }
 
         [Test]
-        public void InquiryTest()
+        public void JsonInquiryTest()
         {
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/account/pricing", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/account/pricing"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("price.json");
                 })
-                .Returns(() => TestingUtils.ReadFile("price.json"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            mocean.Pricing.Inquiry();
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
+            var res = mocean.Pricing.Inquiry();
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("price.json"));
+            TestObject(res);
         }
 
         [Test]
-        public void JsonPricingResponseTest()
+        public void XmlInquiryTest()
         {
-            string jsonResponse = TestingUtils.ReadFile("price.json");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/account/pricing", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/account/pricing", "1"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("price.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(jsonResponse, System.Net.HttpStatusCode.OK, false, "/account/pricing"));
+            );
 
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            var res = mocean.Pricing.Inquiry();
-            Assert.AreEqual(res.ToString(), jsonResponse);
+            apiRequestMock.ApiRequestConfig.Version = "1";
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
+            var res = mocean.Pricing.Inquiry(new PricingRequest
+            {
+                mocean_resp_format = "xml"
+            });
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("price.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-        }
-
-        [Test]
-        public void XmlPricingResponseTest()
-        {
-            string xmlResponse = TestingUtils.ReadFile("price.xml");
-
-            var apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
-                {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/account/pricing", uri);
-                })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/pricing"));
-
-            apiRequestMock.Object.ApiRequestConfig.Version = "1";
-            var mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            var res = mocean.Pricing.Inquiry();
-            Assert.AreEqual(res.ToString(), xmlResponse);
-            TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
-
 
             //V2 Test
-            xmlResponse = TestingUtils.ReadFile("price_v2.xml");
-            apiRequestMock = new Mock<ApiRequest>();
-            apiRequestMock.Setup(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()))
-                .Callback((string method, string uri, IDictionary<string, string> parameters) =>
+            apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual("get", method);
-                    Assert.AreEqual("/account/pricing", uri);
+                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/account/pricing"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("price_v2.xml");
                 })
-                .Returns(() => apiRequestMock.Object.FormatResponse(xmlResponse, System.Net.HttpStatusCode.OK, true, "/account/pricing"));
+            );
 
-            apiRequestMock.Object.ApiRequestConfig.Version = "2";
-            mocean = TestingUtils.GetClientObj(apiRequestMock.Object);
-            res = mocean.Pricing.Inquiry();
-            Assert.AreEqual(res.ToString(), xmlResponse);
+            apiRequestMock.ApiRequestConfig.Version = "2";
+            mocean = TestingUtils.GetClientObj(apiRequestMock);
+            res = mocean.Pricing.Inquiry(new PricingRequest
+            {
+                mocean_resp_format = "xml"
+            });
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("price_v2.xml"));
             TestObject(res);
-
-            apiRequestMock.Verify(apiRequest => apiRequest.Send(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>()), Times.Once);
         }
 
         private static void TestObject(PricingResponse pricingResponse)
