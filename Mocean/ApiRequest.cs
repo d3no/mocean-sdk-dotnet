@@ -1,27 +1,29 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.IO;
-using System.Reflection;
-using System.Collections.Generic;
+﻿using Mocean.Exceptions;
 using Newtonsoft.Json;
-using Mocean.Exceptions;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Text;
 
 namespace Mocean
 {
     public class ApiRequest
     {
         public ApiRequestConfig ApiRequestConfig { get; set; }
+        protected HttpClient httpClient { get; set; }
 
         public string RawResponse { get; private set; }
 
-        public ApiRequest(ApiRequestConfig apiRequestConfig)
+        public ApiRequest(ApiRequestConfig apiRequestConfig, HttpClient httpClient)
         {
             this.ApiRequestConfig = apiRequestConfig;
+            this.httpClient = httpClient;
         }
+
+        public ApiRequest(ApiRequestConfig apiRequestConfig) : this(apiRequestConfig, new HttpClient()) { }
+
+        public ApiRequest(HttpClient httpClient) : this(ApiRequestConfig.make(), httpClient) { }
 
         public ApiRequest() : this(ApiRequestConfig.make()) { }
 
@@ -47,9 +49,9 @@ namespace Mocean
 
             HttpResponseMessage response;
             string res;
-            using (var httpClient = new HttpClient())
+            using (var httpClient = this.httpClient)
             {
-                if(method.Equals("get", StringComparison.CurrentCultureIgnoreCase))
+                if (method.Equals("get", StringComparison.CurrentCultureIgnoreCase))
                 {
                     response = httpClient.GetAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri + "?" + BuildQueryString(parameters)).Result;
                 }

@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Mocean.Verify
@@ -14,10 +9,6 @@ namespace Mocean.Verify
         [JsonProperty("reqid")]
         [XmlElement("reqid")]
         public string ReqId { get; set; }
-
-        [JsonProperty("is_number_reachable")]
-        [XmlElement("is_number_reachable")]
-        public string IsNumberReachable { get; set; }
 
         [JsonProperty("resend_number")]
         [XmlElement("resend_number")]
