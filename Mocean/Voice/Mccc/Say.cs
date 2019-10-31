@@ -8,11 +8,11 @@ namespace Mocean.Voice
 {
     public class Say : AbstractMccc
     {
-        public string Language { set => this.requestData["language"] = value; }
-        public string Text { set => this.requestData["text"] = value; }
-        public bool BargeIn { set => this.requestData["barge-in"] = value; }
+        public string Language { set => this.requestData["language"] = value; get => this.requestData["language"].ToString(); }
+        public string Text { set => this.requestData["text"] = value; get => this.requestData["text"].ToString(); }
+        public bool BargeIn { set => this.requestData["barge-in"] = value; get => (bool)this.requestData["barge-in"]; }
 
-        public bool ClearDigitCache { set => this.requestData["clear-digit-cache"] = value; }
+        public bool ClearDigitCache { set => this.requestData["clear-digit-cache"] = value; get => (bool)this.requestData["clear-digit-cache"]; }
 
         public Say() : this(new Dictionary<string, object>())
         {

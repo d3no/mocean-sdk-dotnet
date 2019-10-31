@@ -8,7 +8,7 @@ namespace Mocean.Voice
 {
     public class Sleep : AbstractMccc
     {
-        public int Duration { set => this.requestData["duration"] = value; }
+        public int Duration { set => this.requestData["duration"] = value; get => (int)this.requestData["duration"]; }
 
         public Sleep() : this(new Dictionary<string, object>())
         {

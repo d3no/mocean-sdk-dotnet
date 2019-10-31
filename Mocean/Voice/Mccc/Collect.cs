@@ -8,11 +8,11 @@ namespace Mocean.Voice
 {
     public class Collect : AbstractMccc
     {
-        public string EventUrl { set => this.requestData["event-url"] = value; }
-        public int Min { set => this.requestData["min"] = value; }
-        public int Max { set => this.requestData["max"] = value; }
-        public string Terminators { set => this.requestData["terminators"] = value; }
-        public int Timeout { set => this.requestData["timeout"] = value; }
+        public string EventUrl { set => this.requestData["event-url"] = value; get => this.requestData["event-url"].ToString(); }
+        public int Min { set => this.requestData["min"] = value; get => (int)this.requestData["min"]; }
+        public int Max { set => this.requestData["max"] = value; get => (int)this.requestData["max"]; }
+        public string Terminators { set => this.requestData["terminators"] = value; get => this.requestData["terminators"].ToString(); }
+        public int Timeout { set => this.requestData["timeout"] = value; get => (int)this.requestData["timeout"]; }
 
         public Collect() : this(new Dictionary<string, object>())
         {
