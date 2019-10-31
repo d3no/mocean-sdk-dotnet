@@ -20,18 +20,13 @@ namespace Mocean.Voice
 
         public Collect(Dictionary<string, object> parameter) : base(parameter)
         {
-            // default value
-            this.requestData["min"] = this.requestData.ContainsKey("min") ? this.requestData["min"] : 1;
-            this.requestData["max"] = this.requestData.ContainsKey("max") ? this.requestData["max"] : 1;
-            this.requestData["terminators"] = this.requestData.ContainsKey("terminators") ? this.requestData["terminators"] : "#";
-            this.requestData["timeout"] = this.requestData.ContainsKey("timeout") ? this.requestData["timeout"] : 5000;
         }
 
         protected override List<string> RequiredKey()
         {
             return new List<string>
             {
-                "event-url", "min", "max", "terminators", "timeout"
+                "event-url", "min", "max", "timeout"
             };
         }
 

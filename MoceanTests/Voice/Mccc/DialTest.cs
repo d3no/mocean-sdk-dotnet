@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace MoceanTests.Voice
 {
     [TestFixture]
-    public class BridgeTest
+    public class DialTest
     {
         [Test]
         public void RequestParamsTest()
@@ -14,16 +14,20 @@ namespace MoceanTests.Voice
             var parameter = new Dictionary<string, object>
             {
                 { "to", "testing to" },
+                { "from", "callerid" },
+                { "dial-sequentially", true },
                 { "action", "dial" }
             };
-            var bridge = new Bridge(parameter);
+            var dial = new Dial(parameter);
 
-            Assert.AreEqual(parameter, bridge.GetRequestData());
+            Assert.AreEqual(parameter, dial.GetRequestData());
 
-            bridge = new Bridge();
-            bridge.To = "testing to";
+            dial = new Dial();
+            dial.To = "testing to";
+            dial.From = "callerid";
+            dial.DialSequentially = true;
 
-            Assert.AreEqual(parameter, bridge.GetRequestData());
+            Assert.AreEqual(parameter, dial.GetRequestData());
         }
 
         [Test]
@@ -33,9 +37,9 @@ namespace MoceanTests.Voice
             {
                 { "to", "testing to" }
             };
-            var bridge = new Bridge(parameter);
+            var dial = new Dial(parameter);
 
-            Assert.AreEqual("dial", bridge.GetRequestData()["action"]);
+            Assert.AreEqual("dial", dial.GetRequestData()["action"]);
         }
 
         [Test]
@@ -43,8 +47,8 @@ namespace MoceanTests.Voice
         {
             Assert.Throws<RequiredFieldException>(() =>
             {
-                var bridge = new Bridge();
-                bridge.GetRequestData();
+                var dial = new Dial();
+                dial.GetRequestData();
             });
         }
     }

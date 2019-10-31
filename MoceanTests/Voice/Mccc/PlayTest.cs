@@ -15,6 +15,7 @@ namespace MoceanTests.Voice
             {
                 { "file", "testing file" },
                 { "barge-in", true },
+                { "clear-digit-cache", true },
                 { "action", "play" }
             };
             var play = new Play(parameter);
@@ -24,6 +25,7 @@ namespace MoceanTests.Voice
             play = new Play();
             play.File = "testing file";
             play.BargeIn = true;
+            play.ClearDigitCache = true;
 
             Assert.AreEqual(parameter, play.GetRequestData());
         }

@@ -16,6 +16,7 @@ namespace MoceanTests.Voice
                 { "language", "testing language" },
                 { "text", "testing text" },
                 { "barge-in", true },
+                { "clear-digit-cache", true },
                 { "action", "say" }
             };
             var say = new Say(parameter);
@@ -26,6 +27,7 @@ namespace MoceanTests.Voice
             say.Language = "testing language";
             say.Text = "testing text";
             say.BargeIn = true;
+            say.ClearDigitCache = true;
 
             Assert.AreEqual(parameter, say.GetRequestData());
         }

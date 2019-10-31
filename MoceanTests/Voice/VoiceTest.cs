@@ -89,7 +89,7 @@ namespace MoceanTests.Voice
             var apiRequestMock = new ApiRequest(
                 TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
                     Assert.AreEqual(TestingUtils.GetTestUri("/voice/dial"), httpRequest.RequestUri.LocalPath);
                     return TestingUtils.GetResponse("voice.json");
                 })
@@ -110,7 +110,7 @@ namespace MoceanTests.Voice
             var apiRequestMock = new ApiRequest(
                 TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
-                    Assert.AreEqual(HttpMethod.Get, httpRequest.Method);
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
                     Assert.AreEqual(TestingUtils.GetTestUri("/voice/dial"), httpRequest.RequestUri.LocalPath);
                     return TestingUtils.GetResponse("voice.xml");
                 })

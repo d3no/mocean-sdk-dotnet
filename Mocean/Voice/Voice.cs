@@ -18,7 +18,7 @@ namespace Mocean.Voice
         {
             this.ValidatedAndParseFields(voice);
 
-            string responseStr = this.ApiRequest.Get("/voice/dial", this.parameters);
+            string responseStr = this.ApiRequest.Post("/voice/dial", this.parameters);
             return (VoiceResponse)ResponseFactory.CreateObjectfromRawResponse<VoiceResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);
         }

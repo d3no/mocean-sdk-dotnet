@@ -28,14 +28,14 @@ namespace Mocean.Voice
             return new Play { File = file };
         }
 
-        public static Bridge bridge()
+        public static Dial dial()
         {
-            return new Bridge();
+            return new Dial();
         }
 
-        public static Bridge bridge(string to)
+        public static Dial dial(string to)
         {
-            return new Bridge { To = to };
+            return new Dial { To = to };
         }
 
         public static Collect collect()
@@ -56,6 +56,11 @@ namespace Mocean.Voice
         public static Sleep sleep(int duration)
         {
             return new Sleep { Duration = duration };
+        }
+
+        public static Record record()
+        {
+            return new Record();
         }
     }
 }

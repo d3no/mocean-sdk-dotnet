@@ -14,7 +14,6 @@ namespace MoceanTests.Voice
             var parameter = new Dictionary<string, object>
             {
                 { "duration", 10000 },
-                { "barge-in", true },
                 { "action", "sleep" }
             };
             var sleep = new Sleep(parameter);
@@ -23,7 +22,6 @@ namespace MoceanTests.Voice
 
             sleep = new Sleep();
             sleep.Duration = 10000;
-            sleep.BargeIn = true;
 
             Assert.AreEqual(parameter, sleep.GetRequestData());
         }

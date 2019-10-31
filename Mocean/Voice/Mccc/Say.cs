@@ -12,6 +12,8 @@ namespace Mocean.Voice
         public string Text { set => this.requestData["text"] = value; }
         public bool BargeIn { set => this.requestData["barge-in"] = value; }
 
+        public bool ClearDigitCache { set => this.requestData["clear-digit-cache"] = value; }
+
         public Say() : this(new Dictionary<string, object>())
         {
         }

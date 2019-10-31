@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 
 namespace Mocean.Voice
 {
-    public class Bridge : AbstractMccc
+    public class Dial : AbstractMccc
     {
         public string To { set => this.requestData["to"] = value; }
 
-        public Bridge() : this(new Dictionary<string, object>())
+        public string From { set => this.requestData["from"] = value; }
+
+        public bool DialSequentially { set => this.requestData["dial-sequentially"] = value; }
+
+        public Dial() : this(new Dictionary<string, object>())
         {
         }
 
-        public Bridge(Dictionary<string, object> parameter) : base(parameter)
+        public Dial(Dictionary<string, object> parameter) : base(parameter)
         {
         }
 

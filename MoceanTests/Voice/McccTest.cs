@@ -17,13 +17,13 @@ namespace MoceanTests.Voice
         }
 
         [Test]
-        public void McccBridgeTest()
+        public void McccDialTest()
         {
-            var bridge = Mccc.bridge();
-            bridge.To = "testing to";
-            Assert.AreEqual("testing to", bridge.GetRequestData()["to"]);
+            var dial = Mccc.dial();
+            dial.To = "testing to";
+            Assert.AreEqual("testing to", dial.GetRequestData()["to"]);
 
-            Assert.AreEqual("testing to2", Mccc.bridge("testing to2").GetRequestData()["to"]);
+            Assert.AreEqual("testing to2", Mccc.dial("testing to2").GetRequestData()["to"]);
         }
 
         [Test]
@@ -31,9 +31,17 @@ namespace MoceanTests.Voice
         {
             var collect = Mccc.collect();
             collect.EventUrl = "testing event url";
+            collect.Min = 1;
+            collect.Max = 10;
+            collect.Timeout = 500;
             Assert.AreEqual("testing event url", collect.GetRequestData()["event-url"]);
 
-            Assert.AreEqual("testing event url", Mccc.collect("testing event url").GetRequestData()["event-url"]);
+            collect = Mccc.collect("testing event url");
+            collect.Min = 1;
+            collect.Max = 10;
+            collect.Timeout = 500;
+
+            Assert.AreEqual("testing event url", collect.GetRequestData()["event-url"]);
         }
 
         [Test]
@@ -54,6 +62,13 @@ namespace MoceanTests.Voice
             Assert.AreEqual(10000, sleep.GetRequestData()["duration"]);
 
             Assert.AreEqual(10000, Mccc.sleep(10000).GetRequestData()["duration"]);
+        }
+
+        [Test]
+        public void McccRecordTest()
+        {
+            var record = Mccc.record();
+            Assert.AreEqual("record", record.GetRequestData()["action"]);
         }
     }
 }
