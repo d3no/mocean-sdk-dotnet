@@ -128,9 +128,10 @@ namespace MoceanTests.Voice
 
         private static void TestObject(VoiceResponse voiceResponse)
         {
-            Assert.AreEqual(voiceResponse.Status, "0");
-            Assert.AreEqual(voiceResponse.CallUuid, "xxx-xxx-xxx-xxx");
-            Assert.AreEqual(voiceResponse.SessionUuid, "xxx-xxx-xxx-xxx");
+            Assert.AreEqual(voiceResponse.Calls[0].Status, "0");
+            Assert.AreEqual(voiceResponse.Calls[0].Receiver, "60123456789");
+            Assert.AreEqual(voiceResponse.Calls[0].CallUuid, "xxx-xxx-xxx-xxx");
+            Assert.AreEqual(voiceResponse.Calls[0].SessionUuid, "xxx-xxx-xxx-xxx");
         }
     }
 }
