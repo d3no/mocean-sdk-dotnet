@@ -86,6 +86,12 @@
     <None Update="Resources\error_response.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\hangup.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\hangup.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\message.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

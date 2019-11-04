@@ -22,5 +22,16 @@ namespace Mocean.Voice
             return (VoiceResponse)ResponseFactory.CreateObjectfromRawResponse<VoiceResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);
         }
+
+        public HangupResponse Hangup(string callUuid)
+        {
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret" };
+
+            this.ValidatedAndParseFields();
+
+            string responseStr = this.ApiRequest.Post("/voice/hangup/" + callUuid, this.parameters);
+            return (HangupResponse)ResponseFactory.CreateObjectfromRawResponse<HangupResponse>(responseStr)
+                .SetRawResponse(this.ApiRequest.RawResponse);
+        }
     }
 }

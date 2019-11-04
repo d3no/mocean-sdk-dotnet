@@ -126,6 +126,42 @@ namespace MoceanTests.Voice
             TestObject(res);
         }
 
+        [Test]
+        public void JsonHangupTest()
+        {
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/hangup/xxx-xxx-xxx-xxx"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("hangup.json");
+                })
+            );
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
+            var res = mocean.Voice.Hangup("xxx-xxx-xxx-xxx");
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("hangup.json"));
+            Assert.AreEqual(res.Status, "0");
+        }
+
+        [Test]
+        public void XmlHangupTest()
+        {
+            var apiRequestMock = new ApiRequest(
+                TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
+                {
+                    Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/hangup/xxx-xxx-xxx-xxx"), httpRequest.RequestUri.LocalPath);
+                    return TestingUtils.GetResponse("hangup.xml");
+                })
+            );
+
+            var mocean = TestingUtils.GetClientObj(apiRequestMock);
+            var res = mocean.Voice.Hangup("xxx-xxx-xxx-xxx");
+            Assert.AreEqual(res.ToString(), TestingUtils.ReadFile("hangup.xml"));
+            Assert.AreEqual(res.Status, "0");
+        }
+
         private static void TestObject(VoiceResponse voiceResponse)
         {
             Assert.AreEqual(voiceResponse.Calls[0].Status, "0");
