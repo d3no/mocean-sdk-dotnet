@@ -1,9 +1,9 @@
 ﻿using Mocean.Exceptions;
-using Mocean.Voice;
+using Mocean.Voice.McObj;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace MoceanTests.Voice
+namespace MoceanTests.Voice.McObj
 {
     [TestFixture]
     public class PlayTest

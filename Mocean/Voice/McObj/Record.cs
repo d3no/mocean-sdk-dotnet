@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    public class Record : AbstractMccc
+    public class Record : AbstractMc
     {
         public Record() : this(new Dictionary<string, object>())
         {

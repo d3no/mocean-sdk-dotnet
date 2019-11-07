@@ -4,39 +4,39 @@ using NUnit.Framework;
 namespace MoceanTests.Voice
 {
     [TestFixture]
-    public class McccTest
+    public class McTest
     {
         [Test]
-        public void McccSayTest()
+        public void McSayTest()
         {
-            var say = Mccc.say();
+            var say = Mc.say();
             say.Text = "testing text";
             Assert.AreEqual("testing text", say.GetRequestData()["text"]);
 
-            Assert.AreEqual("testing text2", Mccc.say("testing text2").GetRequestData()["text"]);
+            Assert.AreEqual("testing text2", Mc.say("testing text2").GetRequestData()["text"]);
         }
 
         [Test]
-        public void McccDialTest()
+        public void McDialTest()
         {
-            var dial = Mccc.dial();
+            var dial = Mc.dial();
             dial.To = "testing to";
             Assert.AreEqual("testing to", dial.GetRequestData()["to"]);
 
-            Assert.AreEqual("testing to2", Mccc.dial("testing to2").GetRequestData()["to"]);
+            Assert.AreEqual("testing to2", Mc.dial("testing to2").GetRequestData()["to"]);
         }
 
         [Test]
-        public void McccCollectTest()
+        public void McCollectTest()
         {
-            var collect = Mccc.collect();
+            var collect = Mc.collect();
             collect.EventUrl = "testing event url";
             collect.Min = 1;
             collect.Max = 10;
             collect.Timeout = 500;
             Assert.AreEqual("testing event url", collect.GetRequestData()["event-url"]);
 
-            collect = Mccc.collect("testing event url");
+            collect = Mc.collect("testing event url");
             collect.Min = 1;
             collect.Max = 10;
             collect.Timeout = 500;
@@ -45,29 +45,29 @@ namespace MoceanTests.Voice
         }
 
         [Test]
-        public void McccPlayTest()
+        public void McPlayTest()
         {
-            var play = Mccc.play();
+            var play = Mc.play();
             play.File = "testing file";
             Assert.AreEqual("testing file", play.GetRequestData()["file"]);
 
-            Assert.AreEqual("testing file", Mccc.play("testing file").GetRequestData()["file"]);
+            Assert.AreEqual("testing file", Mc.play("testing file").GetRequestData()["file"]);
         }
 
         [Test]
-        public void McccSleepTest()
+        public void McSleepTest()
         {
-            var sleep = Mccc.sleep();
+            var sleep = Mc.sleep();
             sleep.Duration = 10000;
             Assert.AreEqual(10000, sleep.GetRequestData()["duration"]);
 
-            Assert.AreEqual(10000, Mccc.sleep(10000).GetRequestData()["duration"]);
+            Assert.AreEqual(10000, Mc.sleep(10000).GetRequestData()["duration"]);
         }
 
         [Test]
-        public void McccRecordTest()
+        public void McRecordTest()
         {
-            var record = Mccc.record();
+            var record = Mc.record();
             Assert.AreEqual("record", record.GetRequestData()["action"]);
         }
     }

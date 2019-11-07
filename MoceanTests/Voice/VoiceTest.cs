@@ -2,6 +2,7 @@
 using Mocean.Exceptions;
 using Mocean.Voice;
 using Mocean.Voice.Mapper;
+using Mocean.Voice.McObj;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -18,51 +19,51 @@ namespace MoceanTests.Voice
             var voiceRequest = new VoiceRequest
             {
                 mocean_to = "test to",
-                mocean_call_event_url = "test call event url",
-                mocean_call_control_commands = "test control commands",
+                mocean_event_url = "test event url",
+                mocean_command = "test mocean command",
                 mocean_resp_format = "json"
             };
 
             Assert.IsNotNull(voiceRequest.mocean_to);
             Assert.AreEqual(voiceRequest.mocean_to, "test to");
-            Assert.IsNotNull(voiceRequest.mocean_call_event_url);
-            Assert.AreEqual(voiceRequest.mocean_call_event_url, "test call event url");
-            Assert.IsNotNull(voiceRequest.mocean_call_control_commands);
-            Assert.AreEqual(voiceRequest.mocean_call_control_commands, "test control commands");
+            Assert.IsNotNull(voiceRequest.mocean_event_url);
+            Assert.AreEqual(voiceRequest.mocean_event_url, "test event url");
+            Assert.IsNotNull(voiceRequest.mocean_command);
+            Assert.AreEqual(voiceRequest.mocean_command, "test mocean command");
             Assert.IsNotNull(voiceRequest.mocean_resp_format);
             Assert.AreEqual(voiceRequest.mocean_resp_format, "json");
 
             voiceRequest = new VoiceRequest();
             Assert.IsNull(voiceRequest.mocean_to);
-            Assert.IsNull(voiceRequest.mocean_call_event_url);
-            Assert.IsNull(voiceRequest.mocean_call_control_commands);
+            Assert.IsNull(voiceRequest.mocean_event_url);
+            Assert.IsNull(voiceRequest.mocean_command);
             Assert.IsNull(voiceRequest.mocean_resp_format);
             voiceRequest.mocean_to = "test to";
             Assert.AreEqual(voiceRequest.mocean_to, "test to");
-            voiceRequest.mocean_call_event_url = "test call event url";
-            Assert.AreEqual(voiceRequest.mocean_call_event_url, "test call event url");
+            voiceRequest.mocean_event_url = "test event url";
+            Assert.AreEqual(voiceRequest.mocean_event_url, "test event url");
             voiceRequest.mocean_resp_format = "json";
             Assert.AreEqual(voiceRequest.mocean_resp_format, "json");
 
-            //test multiple types of mocean_call_event_url
+            //test multiple types of mocean_command
             var dictionaryParams = new Dictionary<string, object> { { "action", "say" } };
-            voiceRequest.mocean_call_control_commands = dictionaryParams;
-            Assert.AreEqual(voiceRequest.mocean_call_control_commands, JsonConvert.SerializeObject(new List<Dictionary<string, object>>
+            voiceRequest.mocean_command = dictionaryParams;
+            Assert.AreEqual(voiceRequest.mocean_command, JsonConvert.SerializeObject(new List<Dictionary<string, object>>
                     {
                         dictionaryParams
                     }));
 
             voiceRequest = new VoiceRequest();
-            var builderParams = (new McccBuilder()).add(Mccc.say("hello world"));
-            voiceRequest.mocean_call_control_commands = builderParams;
-            Assert.IsNotNull(voiceRequest.mocean_call_control_commands);
-            Assert.AreEqual(JsonConvert.SerializeObject(builderParams.build()), voiceRequest.mocean_call_control_commands);
+            var builderParams = (new McBuilder()).add(Mc.say("hello world"));
+            voiceRequest.mocean_command = builderParams;
+            Assert.IsNotNull(voiceRequest.mocean_command);
+            Assert.AreEqual(JsonConvert.SerializeObject(builderParams.build()), voiceRequest.mocean_command);
 
             voiceRequest = new VoiceRequest();
-            var mcccParams = new Say { Text = "hello world" };
-            voiceRequest.mocean_call_control_commands = mcccParams;
-            Assert.IsNotNull(voiceRequest.mocean_call_control_commands);
-            Assert.AreEqual(JsonConvert.SerializeObject((new McccBuilder()).add(mcccParams).build()), voiceRequest.mocean_call_control_commands);
+            var mcParams = new Say { Text = "hello world" };
+            voiceRequest.mocean_command = mcParams;
+            Assert.IsNotNull(voiceRequest.mocean_command);
+            Assert.AreEqual(JsonConvert.SerializeObject((new McBuilder()).add(mcParams).build()), voiceRequest.mocean_command);
         }
 
         [Test]

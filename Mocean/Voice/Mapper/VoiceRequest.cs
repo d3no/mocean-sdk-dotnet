@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Mocean.Voice.McObj;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,43 +13,43 @@ namespace Mocean.Voice.Mapper
         [JsonProperty("mocean-to")]
         public string mocean_to { get; set; }
 
-        [JsonProperty("mocean-call-event-url")]
-        public string mocean_call_event_url { get; set; }
+        [JsonProperty("mocean-event-url")]
+        public string mocean_event_url { get; set; }
 
-        [JsonProperty("mocean-call-control-commands")]
-        public object mocean_call_control_commands
+        [JsonProperty("mocean-command")]
+        public object mocean_command
         {
             get
             {
-                var builderCallControlCommands = _callControlCommands as McccBuilder;
-                if(builderCallControlCommands != null)
+                var builderMoceanCommand = _moceanCommand as McBuilder;
+                if(builderMoceanCommand != null)
                 {
-                    return JsonConvert.SerializeObject(((McccBuilder)_callControlCommands).build());
+                    return JsonConvert.SerializeObject(((McBuilder)_moceanCommand).build());
                 }
 
-                var objCallControlCommands = _callControlCommands as AbstractMccc;
-                if(objCallControlCommands != null)
+                var objMoceanCommand = _moceanCommand as AbstractMc;
+                if(objMoceanCommand != null)
                 {
-                    return JsonConvert.SerializeObject((new McccBuilder()).add((AbstractMccc)_callControlCommands).build());
+                    return JsonConvert.SerializeObject((new McBuilder()).add((AbstractMc)_moceanCommand).build());
                 }
 
-                var dictCallControlCommands = _callControlCommands as Dictionary<string, object>;
-                if(dictCallControlCommands != null)
+                var dictMoceanCommand = _moceanCommand as Dictionary<string, object>;
+                if(dictMoceanCommand != null)
                 {
                     return JsonConvert.SerializeObject(new List<Dictionary<string, object>>
                     {
-                        (Dictionary<string, object>)_callControlCommands
+                        (Dictionary<string, object>)_moceanCommand
                     });
                 }
 
-                return _callControlCommands;
+                return _moceanCommand;
             }
             set
             {
-                _callControlCommands = value;
+                _moceanCommand = value;
             }
         }
-        private object _callControlCommands;
+        private object _moceanCommand;
 
         [JsonProperty("mocean-resp-format")]
         public string mocean_resp_format { get; set; }

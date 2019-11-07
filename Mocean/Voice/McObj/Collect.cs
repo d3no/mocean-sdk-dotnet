@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    public class Collect : AbstractMccc
+    public class Collect : AbstractMc
     {
         public string EventUrl { set => this.requestData["event-url"] = value; get => this.requestData["event-url"].ToString(); }
         public int Min { set => this.requestData["min"] = value; get => (int)this.requestData["min"]; }

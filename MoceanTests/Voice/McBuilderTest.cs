@@ -1,10 +1,11 @@
 ﻿using Mocean.Voice;
+using Mocean.Voice.McObj;
 using NUnit.Framework;
 
 namespace MoceanTests.Voice
 {
     [TestFixture]
-    public class McccBuilderTest
+    public class McBuilderTest
     {
         [Test]
         public void AddTest()
@@ -14,7 +15,7 @@ namespace MoceanTests.Voice
                 File = "testing file"
             };
 
-            var builder = new McccBuilder();
+            var builder = new McBuilder();
             builder.add(play);
             Assert.AreEqual(1, builder.build().Count);
             Assert.AreEqual(play.GetRequestData(), builder.build()[0]);

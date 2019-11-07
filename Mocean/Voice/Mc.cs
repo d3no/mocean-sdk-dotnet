@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mocean.Voice.McObj;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mocean.Voice
 {
-    public static class Mccc
+    public static class Mc
     {
         public static Say say()
         {

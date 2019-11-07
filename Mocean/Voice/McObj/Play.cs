@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    public class Play : AbstractMccc
+    public class Play : AbstractMc
     {
         public string File { set => this.requestData["file"] = value; get => this.requestData["file"].ToString(); }
 

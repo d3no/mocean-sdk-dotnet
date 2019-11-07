@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mocean.Voice.McObj;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,27 +7,27 @@ using System.Threading.Tasks;
 
 namespace Mocean.Voice
 {
-    public class McccBuilder
+    public class McBuilder
     {
-        protected List<AbstractMccc> mcccList;
+        protected List<AbstractMc> mcList;
 
-        public McccBuilder()
+        public McBuilder()
         {
-            this.mcccList = new List<AbstractMccc>();
+            this.mcList = new List<AbstractMc>();
         }
 
-        public McccBuilder add(AbstractMccc mccc)
+        public McBuilder add(AbstractMc mc)
         {
-            this.mcccList.Add(mccc);
+            this.mcList.Add(mc);
             return this;
         }
 
         public List<Dictionary<string, object>> build()
         {
             List<Dictionary<string, object>> converted = new List<Dictionary<string, object>>();
-            foreach (AbstractMccc mccc in this.mcccList)
+            foreach (AbstractMc mc in this.mcList)
             {
-                converted.Add(mccc.GetRequestData());
+                converted.Add(mc.GetRequestData());
             }
             return converted;
         }

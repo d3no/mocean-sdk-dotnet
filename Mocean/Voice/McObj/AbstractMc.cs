@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    abstract public class AbstractMccc
+    abstract public class AbstractMc
     {
         protected Dictionary<string, object> requestData;
 
-        protected AbstractMccc(Dictionary<string, object> parameter)
+        protected AbstractMc(Dictionary<string, object> parameter)
         {
             this.requestData = parameter;
         }

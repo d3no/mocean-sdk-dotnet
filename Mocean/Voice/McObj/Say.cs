@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    public class Say : AbstractMccc
+    public class Say : AbstractMc
     {
         public string Language { set => this.requestData["language"] = value; get => this.requestData["language"].ToString(); }
         public string Text { set => this.requestData["text"] = value; get => this.requestData["text"].ToString(); }

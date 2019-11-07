@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mocean.Voice
+namespace Mocean.Voice.McObj
 {
-    public class Sleep : AbstractMccc
+    public class Sleep : AbstractMc
     {
         public int Duration { set => this.requestData["duration"] = value; get => (int)this.requestData["duration"]; }
 
