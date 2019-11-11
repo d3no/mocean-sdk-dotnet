@@ -47,7 +47,7 @@ namespace MoceanTests.Voice
             var mocean = TestingUtils.GetClientObj(apiRequestMock);
             Assert.Throws<MoceanErrorException>(() =>
             {
-                var res = mocean.Voice.Recording("xxx-xxx-xxx-xxx");
+                mocean.Voice.Recording("xxx-xxx-xxx-xxx");
             });
         }
     }
