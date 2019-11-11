@@ -122,6 +122,9 @@
     <None Update="Resources\price_v2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\recording.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\resend_code.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
