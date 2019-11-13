@@ -133,8 +133,10 @@ namespace MoceanTests.Voice
             var apiRequestMock = new ApiRequest(
                 TestingUtils.GetMockHttpClient((HttpRequestMessage httpRequest) =>
                 {
+                    var dictBody = TestingUtils.RewindBody(httpRequest.Content);
+                    Assert.AreEqual("xxx-xxx-xxx-xxx", dictBody["mocean-call-uuid"]);
                     Assert.AreEqual(HttpMethod.Post, httpRequest.Method);
-                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/hangup/xxx-xxx-xxx-xxx"), httpRequest.RequestUri.LocalPath);
+                    Assert.AreEqual(TestingUtils.GetTestUri("/voice/hangup"), httpRequest.RequestUri.LocalPath);
                     return TestingUtils.GetResponse("hangup.json");
                 })
             );

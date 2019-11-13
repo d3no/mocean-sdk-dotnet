@@ -26,11 +26,12 @@ namespace Mocean.Voice
 
         public HangupResponse Hangup(string callUuid)
         {
-            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret" };
+            this.requiredFields = new List<string> { "mocean-api-key", "mocean-api-secret", "mocean-call-uuid" };
 
+            this.parameters["mocean-call-uuid"] = callUuid;
             this.ValidatedAndParseFields();
 
-            string responseStr = this.ApiRequest.Post("/voice/hangup/" + callUuid, this.parameters);
+            string responseStr = this.ApiRequest.Post("/voice/hangup", this.parameters);
             return (HangupResponse)ResponseFactory.CreateObjectfromRawResponse<HangupResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);
         }
