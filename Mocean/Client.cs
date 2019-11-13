@@ -40,5 +40,6 @@ namespace Mocean
         public SendCode SendCode { get => new SendCode(this, this.ApiRequest); }
         public VerifyCode VerifyCode { get => new VerifyCode(this, this.ApiRequest); }
         public NumberLookup.NumberLookup NumberLookup { get => new NumberLookup.NumberLookup(this, this.ApiRequest); }
+        public Voice.Voice Voice { get => new Voice.Voice(this, this.ApiRequest); }
     }
 }

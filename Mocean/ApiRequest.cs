@@ -29,15 +29,21 @@ namespace Mocean
 
         public string Get(string uri, IDictionary<string, string> parameters)
         {
-            return this.Send("get", uri, parameters);
+            return this.SendAndReturnDecodedBody("get", uri, parameters);
         }
 
         public string Post(string uri, IDictionary<string, string> parameters)
         {
-            return this.Send("post", uri, parameters);
+            return this.SendAndReturnDecodedBody("post", uri, parameters);
         }
 
-        public virtual string Send(string method, string uri, IDictionary<string, string> parameters)
+        public virtual string SendAndReturnDecodedBody(string method, string uri, IDictionary<string, string> parameters)
+        {
+            HttpResponseMessage response = this.Send(method, uri, parameters);
+            return this.FormatResponse(response.Content.ReadAsStringAsync().Result, response.StatusCode, parameters["mocean-resp-format"].Equals("xml", StringComparison.CurrentCultureIgnoreCase), uri);
+        }
+
+        public virtual HttpResponseMessage Send(string method, string uri, IDictionary<string, string> parameters)
         {
             parameters["mocean-medium"] = "DOTNET-SDK";
 
@@ -48,7 +54,6 @@ namespace Mocean
             }
 
             HttpResponseMessage response;
-            string res;
             using (var tempHttpClient = this.httpClient)
             {
                 if (method.Equals("get", StringComparison.CurrentCultureIgnoreCase))
@@ -59,11 +64,9 @@ namespace Mocean
                 {
                     response = tempHttpClient.PostAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri, new FormUrlEncodedContent(parameters)).Result;
                 }
-
-                res = response.Content.ReadAsStringAsync().Result;
             }
 
-            return this.FormatResponse(res, response.StatusCode, parameters["mocean-resp-format"].Equals("xml", StringComparison.CurrentCultureIgnoreCase), uri);
+            return response;
         }
 
         public string FormatResponse(string responseString, HttpStatusCode responseCode, bool isXml, string uri)
