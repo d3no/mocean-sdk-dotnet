@@ -9,7 +9,7 @@ namespace Mocean
 {
     public class Client
     {
-        public static string SDK_VERSION = "2.0.0";
+        public static string SDK_VERSION = "2.1.0";
         public IAuth Credentials { get; }
         public ApiRequest ApiRequest { get; set; }
 
