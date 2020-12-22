@@ -72,7 +72,7 @@ Kindly visit [MoceanApi Docs][doc_main] for more usage
 
 This library is released under the [MIT License][license]
 
-[signup]: https://dashboard.moceanapi.com/register?medium=github&campaign=csharp-sdk
+[signup]: https://dashboard.moceanapi.com/register?medium=github&campaign=dotnet-sdk
 [doc_main]: https://moceanapi.com/docs/?csharp
 [doc_sms]: https://moceanapi.com/docs/?csharp#send-sms
 [license]: LICENSE.md
