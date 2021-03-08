@@ -37,7 +37,11 @@ namespace Mocean.Verify
             {
                 verifyRequestUrl.Append("/sms");
             }
-
+            else if (this.Channel == Channel.Telegram) 
+            {
+                verifyRequestUrl.Append("/telegram");
+            }
+            
             string responseStr = this.ApiRequest.Post(verifyRequestUrl.ToString(), this.parameters);
             var sendCodeResponse = (SendCodeResponse)ResponseFactory.CreateObjectfromRawResponse<SendCodeResponse>(responseStr)
                 .SetRawResponse(this.ApiRequest.RawResponse);

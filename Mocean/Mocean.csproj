@@ -11,7 +11,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <PackageId>Mocean.Csharp.Client</PackageId>
+    <PackageId>MoceanLocal.Csharp.Client</PackageId>
     <Version>2.1.0</Version>
     <PackageProjectUrl>https://github.com/MoceanAPI/mocean-sdk-dotnet</PackageProjectUrl>
     <PackageIconUrl>https://moceanapi.com/images/favicon.png</PackageIconUrl>
@@ -19,10 +19,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>SMS phone moceanapi mocean</PackageTags>
     <PackageReleaseNotes>- Fix dependencies not being downloaded</PackageReleaseNotes>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NET452</DefineConstants>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">

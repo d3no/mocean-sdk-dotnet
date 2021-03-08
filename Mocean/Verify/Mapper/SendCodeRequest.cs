@@ -33,5 +33,7 @@ namespace Mocean.Verify
 
         [JsonProperty("mocean-resp-format")]
         public string mocean_resp_format { get; set; }
+
+    
     }
 }

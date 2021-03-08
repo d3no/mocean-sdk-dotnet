@@ -64,7 +64,8 @@ namespace Mocean
                 {
                     response = tempHttpClient.PostAsync(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri, new FormUrlEncodedContent(parameters)).Result;
                 }
-            }
+                Console.WriteLine(this.ApiRequestConfig.BaseUrl + "/rest/" + this.ApiRequestConfig.Version + uri);
+            }   
 
             return response;
         }

@@ -27,12 +27,12 @@ namespace Mocean.Voice.Mapper
             [XmlElement("receiver")]
             public string Receiver { get; set; }
 
-            [JsonProperty("session-uuid")]
-            [XmlElement("session-uuid")]
+            [JsonProperty("session_uuid")]
+            [XmlElement("session_uuid")]
             public string SessionUuid { get; set; }
 
-            [JsonProperty("call-uuid")]
-            [XmlElement("call-uuid")]
+            [JsonProperty("call_uuid")]
+            [XmlElement("call_uuid")]
             public string CallUuid { get; set; }
         }
     }

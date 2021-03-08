@@ -3,6 +3,7 @@
     public enum Channel
     {
         Auto,
-        Sms
+        Sms,
+        Telegram
     }
 }

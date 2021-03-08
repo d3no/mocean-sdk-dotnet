@@ -41,5 +41,6 @@ namespace Mocean
         public VerifyCode VerifyCode { get => new VerifyCode(this, this.ApiRequest); }
         public NumberLookup.NumberLookup NumberLookup { get => new NumberLookup.NumberLookup(this, this.ApiRequest); }
         public Voice.Voice Voice { get => new Voice.Voice(this, this.ApiRequest); }
+        public Command.Command Command { get => new Command.Command(this, this.ApiRequest);  }
     }
 }

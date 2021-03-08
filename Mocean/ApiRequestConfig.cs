@@ -2,7 +2,8 @@
 {
     public class ApiRequestConfig
     {
-        public string BaseUrl { get; set; } = "https://rest.moceanapi.com";
+        //public string BaseUrl { get; set; } = "https://rest.moceanapi.com";
+        public string BaseUrl { get; set; } = "https://rest-api-staging.moceansms.com";
         public string Version { get; set; } = "2";
 
         public ApiRequestConfig() { }
